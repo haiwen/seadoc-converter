@@ -2,6 +2,12 @@ import pypandoc
 import json
 import random
 import string
+import re
+
+from jinja2._identifier import pattern
+
+from utils import IMAGE_PATTERN
+
 
 def get_random_id():
     ran_str = ''.join(random.sample(string.ascii_letters + string.digits, 22))
@@ -91,6 +97,26 @@ def parse_image(image_json):
     }
     return sdoc_json
 
+def parse_raw_inline(inline_json):
+    try:
+        txt_type = inline_json['c'][0]
+        if txt_type == 'html':
+            img_html = inline_json['c'][1]
+            image_link_res = re.findall(IMAGE_PATTERN, img_html)
+            if image_link_res:
+                image_link = image_link_res[0]
+                sdoc_json = image_link and {
+                    'type': 'image',
+                    'children': [{'id': get_random_id(), 'text': ''}],
+                    'id': get_random_id(),
+                    'data': {'src': image_link},
+                }
+                return sdoc_json
+    except:
+        return None
+    return None
+
+
 def parse_inline_code(code_json):
     code_text = code_json['c'][-1]
     sdoc_json = {
@@ -164,6 +190,10 @@ def parse_paragragh(para_json):
             sdoc_json['children'].append(parse_strong(item, {}))
         if item['t'] == 'Image':
             sdoc_json['children'].append(parse_image(item))
+        if item['t'] == 'RawInline':
+            res = parse_raw_inline(item)
+            if res:
+                sdoc_json['children'].append(parse_raw_inline(item))
 
     return sdoc_json
 
@@ -208,7 +238,8 @@ def parse_table(table_json):
             'children': [],
             'type': 'table-cell'
         }
-
+        if not values:
+            values = [{'t': 'Plain', 'c': [{'t': 'Str', 'c': ''}]}]
         for c in values[0]['c']:
             if c['t'] == 'Str':
                 table_cell['children'].append({'text': c['c'], 'id': get_random_id(), })

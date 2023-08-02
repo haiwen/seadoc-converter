@@ -2,6 +2,9 @@ import re
 from settings import SEAFILE_SERVER, POSITION_TAG
 
 
+IMAGE_PATTERN = r'<img.*?src="(.*?)".*?>'
+
+
 def is_url_link(s):
     if re.match(r'^http[s]?://', s):
         return True
