@@ -3,9 +3,6 @@ import json
 import random
 import string
 import re
-
-from jinja2._identifier import pattern
-
 from utils import IMAGE_PATTERN
 
 
