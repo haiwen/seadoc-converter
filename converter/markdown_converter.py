@@ -167,6 +167,19 @@ def _handle_pagragh_dom(pagragh_json, doc_uuid=''):
 
 
 
+def _handle_table_cell_dom(table_cell_json):
+    output = ''
+    for child in table_cell_json['children']:
+        if 'text' in child:
+            output += _handle_text_style(child)[0]
+        else:
+            child_type = child.get('type')
+            if child_type == 'link':
+                output += _handle_link_dom(child)
+
+    return output
+
+
 #  html2markdown
 def handle_header(header_json, header_type):
     dom = _handle_header_dom(header_json, header_type)
@@ -215,24 +228,26 @@ def handle_table(table_json):
     other_table_rows = table_json['children'][1:]
 
     for first_table_cell in first_table_row['children']:
-        cell_json = first_table_cell['children'][0]
-        if 'type' in cell_json:
-            cell_type = cell_json['type']
-            if cell_type == 'link':
-                th_headers += "<th>%s</th>" % _handle_link_dom(cell_json)
-        else:
-            th_headers += "<th><span>%s</span></th>" % _handle_text_style(cell_json, True)[0]
+        th_headers +=  "<th>%s</th>" % _handle_table_cell_dom(first_table_cell)
+        # cell_json = first_table_cell['children'][0]
+        # if 'type' in cell_json:
+        #     cell_type = cell_json['type']
+        #     if cell_type == 'link':
+        #         th_headers += "<th>%s</th>" % _handle_link_dom(cell_json)
+        # else:
+        #     th_headers += "<th><span>%s</span></th>" % _handle_text_style(cell_json, True)[0]
 
     for table_row in other_table_rows:
         td = ''
         for table_cell in table_row['children']:
-            cell_json = table_cell['children'][0]
-            if 'type' in cell_json:
-                cell_type = cell_json['type']
-                if cell_type == 'link':
-                    td += "<td>%s</td>" % _handle_link_dom(cell_json)
-            else:
-                td += "<td><span>%s</span></td>" % _handle_text_style(cell_json, True)[0]
+            td += "<td>%s</td>" % _handle_table_cell_dom(table_cell)
+            # cell_json = table_cell['children'][0]
+            # if 'type' in cell_json:
+            #     cell_type = cell_json['type']
+            #     if cell_type == 'link':
+            #         td += "<td>%s</td>" % _handle_link_dom(cell_json)
+            # else:
+            #     td += "<td><span>%s</span></td>" % _handle_text_style(cell_json, True)[0]
 
         th_body += "<tr>%s</tr>" % td
 
