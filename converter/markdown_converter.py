@@ -215,14 +215,24 @@ def handle_table(table_json):
     other_table_rows = table_json['children'][1:]
 
     for first_table_cell in first_table_row['children']:
-        text_json = first_table_cell['children'][0]
-        th_headers += "<th><span>%s</span></th>" % _handle_text_style(text_json, True)[0]
+        cell_json = first_table_cell['children'][0]
+        if 'type' in cell_json:
+            cell_type = cell_json['type']
+            if cell_type == 'link':
+                th_headers += "<th>%s</th>" % _handle_link_dom(cell_json)
+        else:
+            th_headers += "<th><span>%s</span></th>" % _handle_text_style(cell_json, True)[0]
 
     for table_row in other_table_rows:
         td = ''
         for table_cell in table_row['children']:
-            text_json = table_cell['children'][0]
-            td += "<td><span>%s</span></td>" % _handle_text_style(text_json, True)[0]
+            cell_json = table_cell['children'][0]
+            if 'type' in cell_json:
+                cell_type = cell_json['type']
+                if cell_type == 'link':
+                    td += "<td>%s</td>" % _handle_link_dom(cell_json)
+            else:
+                td += "<td><span>%s</span></td>" % _handle_text_style(cell_json, True)[0]
 
         th_body += "<tr>%s</tr>" % td
 
