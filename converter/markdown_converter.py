@@ -1,6 +1,6 @@
-import html2text
+from converter import md_hander
 from converter.utils import trans_img_path_to_url
-from settings import  POSITION_TAG, TARGET_TAG
+
 
 HEADER_LABEL = [
     'header1',
@@ -170,7 +170,7 @@ def _handle_pagragh_dom(pagragh_json, doc_uuid=''):
 #  html2markdown
 def handle_header(header_json, header_type):
     dom = _handle_header_dom(header_json, header_type)
-    return html2text.html2text(dom)
+    return md_hander.handle(dom)
 
 
 def handle_img(img_json):
@@ -179,17 +179,17 @@ def handle_img(img_json):
 
 
 def handle_check_list(check_list_json):
-    return html2text.html2text(_handle_check_list_dom(check_list_json))
+    return md_hander.handle(_handle_check_list_dom(check_list_json))
 
 
 def handle_paragraph(paragraph_json, doc_uuid=''):
     dom = _handle_pagragh_dom(paragraph_json, doc_uuid)
-    return html2text.html2text(dom)
+    return md_hander.handle(dom)
 
 
 def handle_list(json_data, ordered=False):
     html = _handle_list_dom(json_data, '', ordered)
-    md = html2text.html2text(html)
+    md = md_hander.handle(html)
     return md
 
 
@@ -204,7 +204,7 @@ def handle_codeblock(code_bloc_json):
 
 def handle_blockquote(json_data):
     html = _handle_blockquote_dom(json_data)
-    md = html2text.html2text(html)
+    md = md_hander.handle(html)
     return md
 
 
@@ -227,7 +227,7 @@ def handle_table(table_json):
         th_body += "<tr>%s</tr>" % td
 
     html = "<figure><table><thead><tr>%s</tr></thead><tbody>%s</tbody></table></figure>" % (th_headers, th_body)
-    return html2text.html2text(html)
+    return md_hander.handle(html)
 
 
 #
@@ -274,7 +274,6 @@ def sdoc2md(json_tree, doc_uuid=''):
         results.append(json2md(sub, doc_uuid))
 
     markdown_text = "\n".join(results)
-    markdown_text = markdown_text.replace(POSITION_TAG, TARGET_TAG)
     return markdown_text
 
 

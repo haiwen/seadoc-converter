@@ -1,5 +1,5 @@
 import re
-from settings import SEAFILE_SERVER, POSITION_TAG
+from settings import SEAFILE_SERVER
 
 
 IMAGE_PATTERN = r'<img.*?src="(.*?)".*?>'
@@ -17,7 +17,7 @@ def trans_img_path_to_url(image_path, doc_uuid):
 
     return "%(server_url)s/%(tag)s/%(doc_uuid)s/%(image_path)s" % ({
         'server_url': SEAFILE_SERVER.rstrip('/'),
-        'tag': POSITION_TAG,
+        'tag': 'api/v2.1/seadoc/download-image',
         'doc_uuid': doc_uuid,
         'image_path': image_path.strip('/')
     })
