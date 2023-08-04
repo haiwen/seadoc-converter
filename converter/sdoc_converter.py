@@ -320,7 +320,7 @@ def md2sdoc(md_txt, username=''):
             l.append(parse_table(item))
 
     sdoc_json = {
-        'cursors': [],
+        'cursors': {},
         'last_modify_user': username,
         'children': l,
         'version': 1
