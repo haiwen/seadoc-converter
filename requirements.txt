@@ -1,2 +1,4 @@
-html2text
+Flask
+gevent
 pypandoc
+html2text

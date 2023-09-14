@@ -3,7 +3,7 @@ import json
 import random
 import string
 import re
-from utils import IMAGE_PATTERN
+from seadoc_converter.converter.utils import IMAGE_PATTERN
 
 
 def get_random_id():
@@ -209,6 +209,7 @@ def parse_blockquote(block_json):
 
     return sdoc_json
 
+
 def parse_table(table_json):
     table_sdoc = {
         'type': 'table',
@@ -216,7 +217,7 @@ def parse_table(table_json):
         'children': [],
         'columns': []
     }
-    table_head = table_json['c'][3][-1][-1][-1]
+    table_head = table_json['c'][3]
     column_num = len(table_head)
     column_length = int (672 / column_num)
     for i in range(column_num):
@@ -228,16 +229,15 @@ def parse_table(table_json):
         'children': [],
         'style': {'minHeight': 43}
     }
-    for r in table_head:
-        values = r[-1]
+    for row in table_head:
         table_cell = {
             'id': get_random_id(),
             'children': [],
             'type': 'table-cell'
         }
-        if not values:
-            values = [{'t': 'Plain', 'c': [{'t': 'Str', 'c': ''}]}]
-        for c in values[0]['c']:
+        if not row:
+            row = [{'t': 'Plain', 'c': [{'t': 'Str', 'c': ''}]}]
+        for c in row[0]['c']:
             if c['t'] == 'Str':
                 table_cell['children'].append({'text': c['c'], 'id': get_random_id(), })
             if c['t'] == 'Space':
@@ -254,26 +254,26 @@ def parse_table(table_json):
 
     table_sdoc['children'].append(table_row_head)
 
-    table_body = table_json['c'][4][-1][-1]
+    table_body = table_json['c'][4]
 
-    for r in table_body:
+    for row in table_body:
         table_row_body = {
             'type': 'table-row',
             'id': get_random_id(),
             'children': [],
             'style': {'minHeight': 43}
         }
-        values = r[-1]
-        for v in values:
+        for v in row:
             table_cell = {
                 'id': get_random_id(),
                 'children': [],
                 'type': 'table-cell'
             }
-            if not v[-1]:
-                v[-1] = [{'t': 'Plain', 'c': [{'t': 'Str', 'c': ''}]}]
 
-            for c in v[-1][-1]['c']:
+            if not v:
+                v = [{'t': 'Plain', 'c': [{'t': 'Str', 'c': ''}]}]
+
+            for c in v[-1]['c']:
                 if c['t'] == 'Str':
                     table_cell['children'].append({'text': c['c'], 'id': get_random_id(), })
                 if c['t'] == 'Space':
