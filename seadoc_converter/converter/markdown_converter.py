@@ -1,5 +1,7 @@
-from converter import md_hander
-from converter.utils import trans_img_path_to_url
+from html2text import HTML2Text
+from seadoc_converter.converter.utils import trans_img_path_to_url
+
+md_hander = HTML2Text(bodywidth=0) # no wrapping length
 
 
 HEADER_LABEL = [
@@ -285,8 +287,3 @@ def sdoc2md(json_tree, doc_uuid=''):
 
     markdown_text = "\n".join(results)
     return markdown_text
-
-
-
-
-
