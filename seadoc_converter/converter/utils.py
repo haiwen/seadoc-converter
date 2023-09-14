@@ -37,7 +37,7 @@ def gen_file_upload_url(op, token):
 def get_file_by_token(path, token):
     filename = os.path.basename(path)
     url = gen_file_get_url(token, filename)
-    content = requests.get(url).content
+    content = requests.get(url, timeout=30).content
     return content
 
 
@@ -51,6 +51,7 @@ def upload_file_by_token(parent_dir, file_name, token, content):
 
     resp = requests.post(upload_link,
                          data={'target_file': new_file_path, 'parent_dir': parent_dir},
-                         files={'file': (new_file_name, content.encode())}
+                         files={'file': (new_file_name, content.encode())},
+                         timeout=30
                          )
     return resp
