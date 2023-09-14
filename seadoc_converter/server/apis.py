@@ -47,6 +47,8 @@ def convert_markdown_to_sdoc():
     path = data.get('path')
     username = data.get('username')
     doc_uuid = data.get('doc_uuid')
+    src_type = data.get('src_type')
+    dst_type = data.get('dst_type')
 
     extension = Path(path).suffix
     if extension not in ['.md', '.sdoc']:
@@ -60,15 +62,17 @@ def convert_markdown_to_sdoc():
     parent_dir = os.path.dirname(path)
     file_name = os.path.basename(path)
 
-    if extension == '.md':
+    if extension == '.md' and src_type == 'markdown' and dst_type == 'sdoc':
         if file_content:
             file_content = md2sdoc(file_content, username=username)
         file_name = file_name[:-2] + 'sdoc'
-    else:
+    elif extension == '.sdoc' and src_type == 'sdoc' and dst_type == 'markdown':
         if file_content:
             file_content = json.loads(file_content)
             file_content = sdoc2md(file_content, doc_uuid=doc_uuid)
         file_name = file_name[:-4] + 'md'
+    else:
+        return {'error_msg': 'unsupported convert type.'}, 400
 
     try:
         resp = upload_file_by_token(parent_dir, file_name, upload_token, file_content)
