@@ -122,7 +122,8 @@ def parse_inline_code(code_json):
     }
     return sdoc_json
 
-def parse_list_sub(list_json):
+
+def parse_unordered_list(list_json):
     sdoc_json = {'type':'unordered_list', 'id': get_random_id(), 'children': []}
     for items in list_json['c']:
         list_item = {'type':'list-item', 'id': get_random_id(), 'children': []}
@@ -130,19 +131,23 @@ def parse_list_sub(list_json):
             if item['t'] in ['Plain', 'Para']:
                 list_item['children'].append({'type': 'list-lic', 'children': parse_plain(item), 'id': get_random_id()})
             if item['t'] == 'BulletList':
-                list_item['children'].append(parse_list(item))
+                list_item['children'].append(parse_unordered_list(item))
+            if item['t'] == 'OrderedList':
+                list_item['children'].append(parse_ordered_list(item))
         sdoc_json['children'].append(list_item)
     return sdoc_json
 
-def parse_list(list_json):
-    sdoc_json = {'type':'unordered_list', 'id': get_random_id(), 'children': []}
-    for items in list_json['c']:
+def parse_ordered_list(list_json):
+    sdoc_json = {'type':'ordered_list', 'id': get_random_id(), 'children': []}
+    for items in list_json['c'][1]:
         list_item = {'type':'list-item', 'id': get_random_id(), 'children': []}
         for item in items:
             if item['t'] in ['Plain', 'Para']:
                 list_item['children'].append({'type': 'list-lic', 'children': parse_plain(item), 'id': get_random_id()})
             if item['t'] == 'BulletList':
-                list_item['children'].append(parse_list_sub(item))
+                list_item['children'].append(parse_unordered_list(item))
+            if item['t'] == 'OrderedList':
+                list_item['children'].append(parse_ordered_list(item))
         sdoc_json['children'].append(list_item)
     return sdoc_json
 
@@ -187,6 +192,8 @@ def parse_paragragh(para_json):
             sdoc_json['children'].append(parse_strong(item, {}))
         if item['t'] == 'Image':
             sdoc_json['children'].append(parse_image(item))
+        if item['t'] == 'Emph':
+            sdoc_json['children'].append(parse_italic(item, {}))
         if item['t'] == 'RawInline':
             res = parse_raw_inline(item)
             if res:
@@ -205,7 +212,9 @@ def parse_blockquote(block_json):
         if item['t'] == 'Para':
             sdoc_json['children'].append(parse_paragragh(item))
         if item['t'] == 'BulletList':
-            sdoc_json['children'].append(parse_list(item))
+            sdoc_json['children'].append(parse_unordered_list(item))
+        if item['t'] == 'OrderedList':
+            sdoc_json['children'].append(parse_ordered_list(item))
 
     return sdoc_json
 
@@ -311,7 +320,10 @@ def md2sdoc(md_txt, username=''):
             l.append(parse_codeblock(item))
 
         if item['t'] == 'BulletList':
-            l.append(parse_list(item))
+            l.append(parse_unordered_list(item))
+
+        if item['t'] == 'OrderedList':
+            l.append(parse_ordered_list(item))
 
         if item['t'] == 'BlockQuote':
             l.append(parse_blockquote(item))
