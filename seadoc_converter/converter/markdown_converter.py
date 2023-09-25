@@ -16,8 +16,8 @@ HEADER_LABEL = [
 def _handle_text_style(json_data_text, return_null=False):
     text = json_data_text.get('text', '')
     pure_text = text
-    bold = json_data_text.get('BOLD')
-    italic = json_data_text.get('ITALIC')
+    bold = json_data_text.get('bold')
+    italic = json_data_text.get('italic')
 
     if italic:
         text = "_%s_" % text
@@ -75,7 +75,7 @@ def _handle_list_dom(list_json, tag='', ordered=False):
             if lic.get('type') == 'ordered_list':
                 tag += _handle_list_dom(lic, '', True)
 
-            if lic.get('type') == 'list-lic':
+            if lic.get('type') == 'list_lic':
                 for item in lic['children']:
                     if 'text' in item:
                         text += _handle_text_style(item)[0]
@@ -127,7 +127,7 @@ def _handle_blockquote_dom(blockquote_json):
         if child_type == 'paragraph':
             output += '%s' % _handle_pagragh_dom(child)
 
-        if child_type == 'check-list-item':
+        if child_type == 'check_list_item':
             output += '%s' % _handle_check_list_dom(child)
 
         if child_type == 'image':
@@ -250,7 +250,7 @@ def json2md(json_data, doc_uuid=''):
         output = handle_header(json_data, doc_type)
         markdown_output += output
 
-    if doc_type == 'check-list-item':
+    if doc_type == 'check_list_item':
         output = handle_check_list(json_data)
         markdown_output += output
 
@@ -258,7 +258,7 @@ def json2md(json_data, doc_uuid=''):
         output = handle_paragraph(json_data, doc_uuid)
         markdown_output += output
 
-    if doc_type == 'code-block':
+    if doc_type == 'code_block':
         output = handle_codeblock(json_data)
         markdown_output += output
 

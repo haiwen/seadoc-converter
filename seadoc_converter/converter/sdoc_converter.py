@@ -12,7 +12,7 @@ def get_random_id():
 
 
 def parse_italic(italic_json, json_doc={}):
-    json_doc['ITALIC'] = True
+    json_doc['italic'] = True
     children = italic_json['c']
     for item in children:
         if item['t'] == 'Strong':
@@ -23,7 +23,7 @@ def parse_italic(italic_json, json_doc={}):
     return json_doc
 
 def parse_strong(strong_json, json_doc={}):
-    json_doc['BOLD'] = True
+    json_doc['bold'] = True
     children = strong_json['c']
     for item in children:
         if item['t'] == 'Emph':
@@ -126,10 +126,10 @@ def parse_inline_code(code_json):
 def parse_unordered_list(list_json):
     sdoc_json = {'type':'unordered_list', 'id': get_random_id(), 'children': []}
     for items in list_json['c']:
-        list_item = {'type':'list-item', 'id': get_random_id(), 'children': []}
+        list_item = {'type':'list_item', 'id': get_random_id(), 'children': []}
         for item in items:
             if item['t'] in ['Plain', 'Para']:
-                list_item['children'].append({'type': 'list-lic', 'children': parse_plain(item), 'id': get_random_id()})
+                list_item['children'].append({'type': 'list_lic', 'children': parse_plain(item), 'id': get_random_id()})
             if item['t'] == 'BulletList':
                 list_item['children'].append(parse_unordered_list(item))
             if item['t'] == 'OrderedList':
@@ -140,10 +140,10 @@ def parse_unordered_list(list_json):
 def parse_ordered_list(list_json):
     sdoc_json = {'type':'ordered_list', 'id': get_random_id(), 'children': []}
     for items in list_json['c'][1]:
-        list_item = {'type':'list-item', 'id': get_random_id(), 'children': []}
+        list_item = {'type':'list_item', 'id': get_random_id(), 'children': []}
         for item in items:
             if item['t'] in ['Plain', 'Para']:
-                list_item['children'].append({'type': 'list-lic', 'children': parse_plain(item), 'id': get_random_id()})
+                list_item['children'].append({'type': 'list_lic', 'children': parse_plain(item), 'id': get_random_id()})
             if item['t'] == 'BulletList':
                 list_item['children'].append(parse_unordered_list(item))
             if item['t'] == 'OrderedList':
@@ -159,7 +159,7 @@ def parse_codeblock(code_json):
         lang = ''
 
     sdoc_json = {
-        'type': 'code-block',
+        'type': 'code_block',
         'children': [],
         'id': get_random_id(),
         'language': lang or 'plaintext',
@@ -168,7 +168,7 @@ def parse_codeblock(code_json):
     main_code = code_json['c'][1]
     for code in main_code.split('\n'):
         sdoc_json['children'].append({
-            'type':'code-line',
+            'type':'code_line',
             'id': get_random_id(),
             'children':[{'text': code}]
         })
@@ -233,16 +233,16 @@ def parse_table(table_json):
         table_sdoc['columns'].append({'width': column_length})
 
     table_row_head = {
-        'type': 'table-row',
+        'type': 'table_row',
         'id': get_random_id(),
         'children': [],
-        'style': {'minHeight': 43}
+        'style': {'min_height': 43}
     }
     for row in table_head:
         table_cell = {
             'id': get_random_id(),
             'children': [],
-            'type': 'table-cell'
+            'type': 'table_cell'
         }
         if not row:
             row = [{'t': 'Plain', 'c': [{'t': 'Str', 'c': ''}]}]
@@ -267,16 +267,16 @@ def parse_table(table_json):
 
     for row in table_body:
         table_row_body = {
-            'type': 'table-row',
+            'type': 'table_row',
             'id': get_random_id(),
             'children': [],
-            'style': {'minHeight': 43}
+            'style': {'min_height': 43}
         }
         for v in row:
             table_cell = {
                 'id': get_random_id(),
                 'children': [],
-                'type': 'table-cell'
+                'type': 'table_cell'
             }
 
             if not v:
@@ -335,7 +335,8 @@ def md2sdoc(md_txt, username=''):
         'cursors': {},
         'last_modify_user': username,
         'children': l,
-        'version': 1
+        'version': 1,
+        'format_version': 2,
     }
 
     return sdoc_json
