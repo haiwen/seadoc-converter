@@ -129,7 +129,7 @@ def parse_unordered_list(list_json):
         list_item = {'type':'list_item', 'id': get_random_id(), 'children': []}
         for item in items:
             if item['t'] in ['Plain', 'Para']:
-                list_item['children'].append({'type': 'list_lic', 'children': parse_plain(item), 'id': get_random_id()})
+                list_item['children'].append({'type': 'paragraph', 'children': parse_plain(item), 'id': get_random_id()})
             if item['t'] == 'BulletList':
                 list_item['children'].append(parse_unordered_list(item))
             if item['t'] == 'OrderedList':
@@ -143,7 +143,7 @@ def parse_ordered_list(list_json):
         list_item = {'type':'list_item', 'id': get_random_id(), 'children': []}
         for item in items:
             if item['t'] in ['Plain', 'Para']:
-                list_item['children'].append({'type': 'list_lic', 'children': parse_plain(item), 'id': get_random_id()})
+                list_item['children'].append({'type': 'paragraph', 'children': parse_plain(item), 'id': get_random_id()})
             if item['t'] == 'BulletList':
                 list_item['children'].append(parse_unordered_list(item))
             if item['t'] == 'OrderedList':

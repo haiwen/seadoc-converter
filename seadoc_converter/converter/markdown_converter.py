@@ -75,7 +75,7 @@ def _handle_list_dom(list_json, tag='', ordered=False):
             if lic.get('type') == 'ordered_list':
                 tag += _handle_list_dom(lic, '', True)
 
-            if lic.get('type') == 'list_lic':
+            if lic.get('type') == 'paragraph':
                 for item in lic['children']:
                     if 'text' in item:
                         text += _handle_text_style(item)[0]
