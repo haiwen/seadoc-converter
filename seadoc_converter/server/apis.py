@@ -12,7 +12,8 @@ from seadoc_converter import config
 from seadoc_converter.converter.sdoc_converter import md2sdoc
 from seadoc_converter.converter.markdown_converter import sdoc2md
 from seadoc_converter.converter.docx_converter import sdoc2docx
-from seadoc_converter.converter.utils import get_file_by_token, upload_file_by_token
+from seadoc_converter.converter.utils import get_file_by_token, upload_file_by_token, \
+        gen_file_upload_url
 
 logger = logging.getLogger(__name__)
 flask_app = Flask(__name__)
@@ -133,7 +134,6 @@ def sdoc_convert_to_docx():
         return {'error_msg': 'unsupported convert type.'}, 400
 
     # upload file
-    from seadoc_converter.converter.utils import gen_file_upload_url
     upload_url = gen_file_upload_url('upload-api', upload_token)
     files = {
         'file': (new_filename, docx_content),
