@@ -22,8 +22,11 @@ def get_image_content_url(file_uuid, image_name):
     params = {'image_name': image_name}
     headers = {"authorization": "token %s" % jwt_token}
     resp = requests.get(url, params, headers=headers)
-
-    return resp.json().get('download_link')
+    if resp.status_code == 200:
+        return resp.json().get('download_link')
+    else:
+        logger.error(resp.__dict__)
+        return ""
 
 
 def sdoc2docx(file_content_json, file_uuid, username):
