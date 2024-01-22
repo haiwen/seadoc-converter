@@ -9,7 +9,7 @@ from urllib.parse import quote
 from flask import request, Flask, Response
 from seadoc_converter import config
 
-from seadoc_converter.converter.sdoc_converter import md2sdoc
+from seadoc_converter.converter.sdoc_converter import md2sdoc, docx2sdoc
 from seadoc_converter.converter.markdown_converter import sdoc2md
 from seadoc_converter.converter.docx_converter import sdoc2docx
 from seadoc_converter.converter.utils import get_file_by_token, upload_file_by_token, \
@@ -56,13 +56,16 @@ def convert_markdown_to_sdoc():
     dst_type = data.get('dst_type')
 
     extension = Path(path).suffix
-    if extension not in ['.md', '.sdoc']:
+    if extension not in ['.md', '.sdoc', '.docx']:
         return {'error_msg': 'path invalid.'}, 400
 
     download_token = data.get('download_token')
     upload_token = data.get('upload_token')
 
-    file_content = get_file_by_token(path, download_token).decode()
+    if extension == '.docx':
+        file_content = get_file_by_token(path, download_token)
+    else:
+        file_content = get_file_by_token(path, download_token).decode()
 
     parent_dir = os.path.dirname(path)
     file_name = os.path.basename(path)
@@ -71,6 +74,10 @@ def convert_markdown_to_sdoc():
         if file_content:
             file_content = md2sdoc(file_content, username=username)
         file_name = file_name[:-2] + 'sdoc'
+    if extension == '.docx' and src_type == 'docx' and dst_type == 'sdoc':
+        if file_content:
+            file_content = docx2sdoc(file_content, data)
+        file_name = file_name[:-4] + 'sdoc'
     elif extension == '.sdoc' and src_type == 'sdoc' and dst_type == 'markdown':
         if file_content:
             file_content = json.loads(file_content)
