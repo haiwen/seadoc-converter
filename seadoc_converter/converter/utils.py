@@ -1,17 +1,21 @@
 import re
 import os
+import jwt
 import json
 import requests
-from seadoc_converter.config import SEAHUB_SERVICE_URL, FILE_SERVER_ROOT
+from seadoc_converter.config import SEAHUB_SERVICE_URL, \
+        FILE_SERVER_ROOT, SEADOC_PRIVATE_KEY
 
 
 IMAGE_PATTERN = r'<img.*?src="(.*?)".*?>'
+
 
 def is_url_link(s):
     if re.match(r'^http[s]?://', s):
         return True
     else:
         return False
+
 
 def trans_img_path_to_url(image_path, doc_uuid):
     if is_url_link(image_path):
@@ -54,3 +58,10 @@ def upload_file_by_token(parent_dir, file_name, token, content):
                          files={'file': (new_file_name, content.encode())}
                          )
     return resp
+
+
+def gen_jwt_auth_header(payload):
+
+    jwt_token = jwt.encode(payload, SEADOC_PRIVATE_KEY, algorithm='HS256')
+    headers = {"authorization": "token %s" % jwt_token}
+    return headers

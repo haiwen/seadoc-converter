@@ -1,6 +1,5 @@
 import os
 import io
-import jwt
 import docx
 import logging
 import requests
@@ -8,7 +7,8 @@ import requests
 from docx import Document
 from docx.shared import Pt, Inches
 from docx.enum.text import WD_COLOR_INDEX
-from seadoc_converter.config import SEAHUB_SERVICE_URL, SEADOC_PRIVATE_KEY
+from seadoc_converter.config import SEAHUB_SERVICE_URL
+from seadoc_converter.converter.utils import gen_jwt_auth_header
 
 logger = logging.getLogger(__name__)
 
@@ -16,11 +16,11 @@ logger = logging.getLogger(__name__)
 def get_image_content_url(file_uuid, image_name):
 
     payload = {'file_uuid': file_uuid}
-    jwt_token = jwt.encode(payload, SEADOC_PRIVATE_KEY, algorithm='HS256')
 
     url = f'{SEAHUB_SERVICE_URL}/api/v2.1/seadoc/image-download-link/{file_uuid}/'
     params = {'image_name': image_name}
-    headers = {"authorization": "token %s" % jwt_token}
+    headers = gen_jwt_auth_header(payload)
+
     resp = requests.get(url, params, headers=headers)
     if resp.status_code == 200:
         return resp.json().get('download_link')

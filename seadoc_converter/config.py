@@ -19,6 +19,7 @@ LOG_FILE = None
 LOG_LEVEL = 'info'
 ENABLE_SYS_LOG = False
 
+PANDOC_MEDIA_ROOT = '/tmp/pandoc'
 
 try:
     if os.path.exists('local_settings.py'):
