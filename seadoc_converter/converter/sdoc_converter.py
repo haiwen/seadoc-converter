@@ -435,7 +435,9 @@ def docx2sdoc(docx_content, data):
     pandoc_media_root = f'{PANDOC_MEDIA_ROOT}/{time.time()}'
 
     docx_json_str = pypandoc.convert_text(docx_content, 'json', 'docx',
-                                          extra_args=[f'--extract-media={pandoc_media_root}'])
+                                          extra_args=[f'--extract-media={pandoc_media_root}',
+                                                      '--from', 'docx+empty_paragraphs'])
+
     docx_json_obj = json.loads(docx_json_str)
     blocks = docx_json_obj['blocks']
 
