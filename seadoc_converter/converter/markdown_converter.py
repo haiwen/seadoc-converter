@@ -242,7 +242,16 @@ def handle_table(table_json):
     return md_hander.handle(html)
 
 
-#
+def handle_callout(json_data):
+    children = json_data.get('children')
+    callout = ''
+
+    for child in children:
+        output = handle_paragraph(child)
+        callout += output
+    return callout
+
+
 def json2md(json_data, doc_uuid=''):
     doc_type = json_data.get('type')
     markdown_output = ''
@@ -276,6 +285,10 @@ def json2md(json_data, doc_uuid=''):
 
     if doc_type == 'blockquote':
         output = handle_blockquote(json_data)
+        markdown_output += output
+
+    if doc_type == 'callout':
+        output = handle_callout(json_data)
         markdown_output += output
 
     return markdown_output
