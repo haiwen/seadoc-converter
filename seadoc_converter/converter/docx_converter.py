@@ -6,11 +6,15 @@ import requests
 
 from docx import Document
 from docx.shared import Pt, Inches
-from docx.enum.text import WD_COLOR_INDEX
+from docx.oxml.ns import qn
+from docx.oxml.shared import OxmlElement
+
 from seadoc_converter.config import SEAHUB_SERVICE_URL
 from seadoc_converter.converter.utils import gen_jwt_auth_header
 
 logger = logging.getLogger(__name__)
+
+DEFAULT_CALLOUT_COLOR = 'fef7e0'
 
 
 def get_image_content_url(file_uuid, image_name):
@@ -84,19 +88,19 @@ def sdoc2docx(file_content_json, file_uuid, username):
 
         return text_list
 
-    def search_sdoc_node_recursively(children_list, type_sq=[], top_type=''):
+    def search_sdoc_node_recursively(children_list, type_sq=[], top_type='', top_style=''):
 
         if 'text' in children_list[0]:
             if top_type == "ordered_list" and type_sq.count('ordered_list') == 1:
-                type_content_list.append(['ordered_list_2', children_list])
+                type_content_list.append(['ordered_list_2', children_list, top_style])
             elif top_type == "ordered_list" and type_sq.count('ordered_list') >= 2:
-                type_content_list.append(['ordered_list_3', children_list])
+                type_content_list.append(['ordered_list_3', children_list, top_style])
             elif top_type == "unordered_list" and type_sq.count('unordered_list') == 1:
-                type_content_list.append(['ordered_list_2', children_list])
+                type_content_list.append(['ordered_list_2', children_list, top_style])
             elif top_type == "unordered_list" and type_sq.count('unordered_list') >= 2:
-                type_content_list.append(['ordered_list_3', children_list])
+                type_content_list.append(['ordered_list_3', children_list, top_style])
             else:
-                type_content_list.append([top_type, children_list])
+                type_content_list.append([top_type, children_list, top_style])
         else:
             if top_type == 'table':
                 table_text_list = extract_text_in_table_recursively(children_list)
@@ -105,21 +109,22 @@ def sdoc2docx(file_content_json, file_uuid, username):
                 for i in range(0, len(table_text_list), sub_length):
                     new_table_text_list.append(table_text_list[i:i + sub_length])
 
-                type_content_list.append([top_type, new_table_text_list])
+                type_content_list.append([top_type, new_table_text_list, top_style])
             else:
                 for children in children_list:
                     current_type = children.get('type', 'no type')
                     sub_children_list = children.get('children', [])
                     search_sdoc_node_recursively(sub_children_list,
                                                  type_sq + [current_type],
-                                                 top_type=top_type)
+                                                 top_type=top_type, top_style=top_style)
 
     sdoc_node_list = file_content_json.get('children', [])
     type_content_list = []
     for sdoc_node in sdoc_node_list:
         top_sdoc_type = sdoc_node.get('type', '')
         children_list = sdoc_node.get('children', '')
-        search_sdoc_node_recursively(children_list, top_type=top_sdoc_type)
+        style = sdoc_node.get('style', '')
+        search_sdoc_node_recursively(children_list, top_type=top_sdoc_type, top_style=style)
 
     document = Document()
 
@@ -127,6 +132,7 @@ def sdoc2docx(file_content_json, file_uuid, username):
 
         sdoc_type = type_content[0]
         content = type_content[1]
+        style = type_content[2]
 
         if sdoc_type == 'title':
             docx_paragraph = document.add_heading(level=0)
@@ -270,11 +276,30 @@ def sdoc2docx(file_content_json, file_uuid, username):
         elif sdoc_type == 'callout':
 
             docx_paragraph = document.add_paragraph()
+
+            # Create XML element
+            shd = OxmlElement('w:shd')
+            color = DEFAULT_CALLOUT_COLOR
+            if style:
+                color = style.get('background_color').lstrip('#')
+
+            # Add attributes to the element
+            shd.set(qn('w:fill'), color)
+
+            # Make sure the paragraph styling element exists
+            docx_paragraph.paragraph_format.element.get_or_add_pPr()
+
+            # Append the shading element
+            docx_paragraph.paragraph_format.element.pPr.append(shd)
+
             for text_dict in content:
                 text = text_dict.get('text', '')
                 run = docx_paragraph.add_run(text)
-                run.font.highlight_color = WD_COLOR_INDEX.GRAY_25
 
+                bold = text_dict.get('bold', False)
+                run.bold = True if bold else False
+                italic = text_dict.get('italic', False)
+                run.italic = True if italic else False
         else:
 
             for text_dict in content:
