@@ -254,7 +254,10 @@ def sdoc2docx(file_content_json, file_uuid, username):
             if image_content_url:
                 resp = requests.get(image_content_url)
                 image_content = resp.content
-                document.add_picture(io.BytesIO(image_content), width=Inches(5))
+                try:
+                    document.add_picture(io.BytesIO(image_content), width=Inches(5))
+                except Exception as e:
+                    logger.debug('add image to docx failed: file_uuid: %s, image_path: %s, error: %s', file_uuid, image_content_url, e)
             else:
                 logger.exception(f'can not get image content: {file_uuid} {image_file_path}')
 
