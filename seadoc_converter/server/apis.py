@@ -12,8 +12,6 @@ from seadoc_converter import config
 from seadoc_converter.converter.sdoc_converter import md2sdoc, docx2sdoc
 from seadoc_converter.converter.markdown_converter import sdoc2md
 from seadoc_converter.converter.docx_converter import sdoc2docx
-from seadoc_converter.converter.utils import get_file_by_token, upload_file_by_token, \
-        gen_file_upload_url
 
 logger = logging.getLogger(__name__)
 flask_app = Flask(__name__)
@@ -59,13 +57,19 @@ def convert_markdown_to_sdoc():
     if extension not in ['.md', '.sdoc', '.docx']:
         return {'error_msg': 'path invalid.'}, 400
 
-    download_token = data.get('download_token')
-    upload_token = data.get('upload_token')
+    download_url = data.get('download_url')
+    upload_url = data.get('upload_url')
+
+    if not download_url:
+        return {'error_msg': 'download_url invalid.'}, 400
+
+    if not upload_url:
+        return {'error_msg': 'upload_url invalid.'}, 400
 
     if extension == '.docx':
-        file_content = get_file_by_token(path, download_token)
+        file_content = requests.get(download_url).content
     else:
-        file_content = get_file_by_token(path, download_token).decode()
+        file_content = requests.get(download_url).content.decode()
 
     parent_dir = os.path.dirname(path)
     file_name = os.path.basename(path)
@@ -86,8 +90,15 @@ def convert_markdown_to_sdoc():
     else:
         return {'error_msg': 'unsupported convert type.'}, 400
 
+    if isinstance(file_content, dict):
+        file_content = json.dumps(file_content)
+
     try:
-        resp = upload_file_by_token(parent_dir, file_name, upload_token, file_content)
+        new_file_path = os.path.join(parent_dir, file_name)
+        resp = requests.post(upload_url,
+                             data={'target_file': new_file_path, 'parent_dir': parent_dir},
+                             files={'file': (file_name, file_content.encode())}
+                             )
         if not resp.ok:
             logger.error(resp.text)
             return {'error_msg': resp.text}, 500
@@ -123,10 +134,15 @@ def sdoc_convert_to_docx():
     if extension not in ['.sdoc']:
         return {'error_msg': 'path invalid.'}, 400
 
-    download_token = data.get('download_token')
-    upload_token = data.get('upload_token')
+    download_url = data.get('download_url')
+    upload_url = data.get('upload_url')
+    if not download_url:
+        return {'error_msg': 'download_url invalid.'}, 400
 
-    sdoc_content = get_file_by_token(path, download_token).decode()
+    if not upload_url:
+        return {'error_msg': 'upload_url invalid.'}, 400
+
+    sdoc_content = requests.get(download_url).content.decode()
 
     parent_dir = os.path.dirname(path)
     filename = os.path.basename(path)
@@ -141,7 +157,6 @@ def sdoc_convert_to_docx():
         return {'error_msg': 'unsupported convert type.'}, 400
 
     # upload file
-    upload_url = gen_file_upload_url('upload-api', upload_token)
     files = {
         'file': (new_filename, docx_content),
         'parent_dir': parent_dir,
@@ -178,13 +193,16 @@ def sdoc_export_to_docx():
     doc_uuid = data.get('doc_uuid')
     src_type = data.get('src_type')
     dst_type = data.get('dst_type')
+    download_url = data.get('download_url')
 
     extension = Path(path).suffix
     if extension not in ['.sdoc']:
         return {'error_msg': 'path invalid.'}, 400
 
-    download_token = data.get('download_token')
-    sdoc_content = get_file_by_token(path, download_token).decode()
+    if not download_url:
+        return {'error_msg': 'download_url invalid.'}, 400
+
+    sdoc_content = requests.get(download_url).content.decode()
 
     docx_content = b''
     if extension == '.sdoc' and src_type == 'sdoc' and dst_type == 'docx':
