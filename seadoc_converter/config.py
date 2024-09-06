@@ -39,5 +39,3 @@ except ImportError as e:
 # config in env
 SEADOC_PRIVATE_KEY = os.environ.get('JWT_PRIVATE_KEY', '') or SEADOC_PRIVATE_KEY
 SEAHUB_SERVICE_URL = os.environ.get('SEAHUB_SERVICE_URL', '') or SEAHUB_SERVICE_URL
-
-FILE_SERVER_ROOT = os.environ.get('FILE_SERVER_ROOT', '') or FILE_SERVER_ROOT
