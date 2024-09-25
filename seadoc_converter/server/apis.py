@@ -9,9 +9,9 @@ from urllib.parse import quote
 from flask import request, Flask, Response
 from seadoc_converter import config
 
-from seadoc_converter.converter.sdoc_converter import md2sdoc, docx2sdoc
+from seadoc_converter.converter.sdoc_converter.docx2sdoc import docx2sdoc
+from seadoc_converter.converter.sdoc_converter.md2sdoc import md2sdoc
 from seadoc_converter.converter.markdown_converter import sdoc2md
-from seadoc_converter.converter.docx_converter import sdoc2docx
 
 logger = logging.getLogger(__name__)
 flask_app = Flask(__name__)
@@ -80,7 +80,7 @@ def convert_markdown_to_sdoc():
         file_name = file_name[:-2] + 'sdoc'
     elif extension == '.docx' and src_type == 'docx' and dst_type == 'sdoc':
         if file_content:
-            file_content = docx2sdoc(file_content, data)
+            file_content = docx2sdoc(file_content, **data)
         file_name = file_name[:-4] + 'sdoc'
     elif extension == '.sdoc' and src_type == 'sdoc' and dst_type == 'markdown':
         if file_content:
