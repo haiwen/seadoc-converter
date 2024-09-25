@@ -4,7 +4,7 @@ import json
 import logging
 import xml.etree.ElementTree as ET
 
-from io import BytesIO
+from io import BytesIO, StringIO
 from xml.etree import ElementTree
 
 from docx import Document
@@ -217,8 +217,35 @@ def parse_quote(content_items):
     return {'id': get_random_id(), 'type': 'blockquote', 'children': children_sdoc}
 
 
-def merge_ordered_lists():
-    pass
+def merge_ordered_lists(children_list):
+    merged_list = []
+    current_child = None
+
+    for child in children_list:
+        if child['type'] == 'unordered_list':
+            if current_child and current_child['type'] == 'unordered_list':
+                current_child['children'].extend(child['children'])
+            else:
+                if current_child:
+                    merged_list.append(current_child)
+                current_child = child
+        elif child['type'] == 'ordered_list':
+            if current_child and current_child['type'] == 'ordered_list':
+                current_child['children'].extend(child['children'])
+            else:
+                if current_child:
+                    merged_list.append(current_child)
+                current_child = child
+        else:
+            if current_child:
+                merged_list.append(current_child)
+                current_child = None
+            merged_list.append(child)
+
+    if current_child:
+        merged_list.append(current_child)
+
+    return merged_list
 
 
 def docx2sdoc(docx, username, doc_uuid, **kwargs):
@@ -259,6 +286,7 @@ def docx2sdoc(docx, username, doc_uuid, **kwargs):
         elif style == 'Quote':
             children_list.append(parse_quote(block.iter_inner_content()))
 
+    children_list = merge_ordered_lists(children_list)
     sdoc_json = {
         'cursors': {},
         'last_modify_user': username,
