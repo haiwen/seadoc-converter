@@ -120,7 +120,7 @@ def parse_html_inline_block(html):
             'id': get_random_id(),
             'type': 'image',
             'children': [{'id': get_random_id(), 'text': ''}],
-            'data': {'src': imgsrc, 'width': width}
+            'data': {'src': imgsrc, 'width': int(width)}
         }
         return [empty_elem, img_struct, empty_elem]
     else:
@@ -188,33 +188,46 @@ def md2sdoc(md_txt, username=''):
     md = MarkdownIt("gfm-like").use(tasklists_plugin)
     tokens = md.parse(md_txt)
     root = SyntaxTreeNode(tokens).children
-    children_list = []
 
-    for node in root:
-        if node.type == 'heading':
-            children_list.append(parse_header(node))
-        elif node.type == 'paragraph':
-            children_list.append(parse_paragraph(node))
-        elif node.type == 'bullet_list':
-            if node.attrs.get('class') == 'contains-task-list':
-                children_list.append(parse_check_list(node))
-            else:
-                children_list.append(parse_list(node, 'unordered_list'))
-        elif node.type == 'ordered_list':
-            children_list.append(parse_list(node, 'ordered_list'))
-        elif node.type == 'table':
-            children_list.append(parse_table(node))
-        elif node.type == 'fence':
-            children_list.append(parse_codeblock(node))
-        elif node.type == 'html_block':
-            children_list.append(
-                {
-                    'type': 'paragraph',
-                    'children': parse_html_inline_block(node.content),
-                    'id': get_random_id(),
-                }
-            )
+    def _parse_node(root):
+        children_list = []
+        for node in root:
+            if node.type == 'heading':
+                children_list.append(parse_header(node))
+            elif node.type == 'paragraph':
+                children_list.append(parse_paragraph(node))
+            elif node.type == 'bullet_list':
+                if node.attrs.get('class') == 'contains-task-list':
+                    children_list.append(parse_check_list(node))
+                else:
+                    children_list.append(parse_list(node, 'unordered_list'))
+            elif node.type == 'ordered_list':
+                children_list.append(parse_list(node, 'ordered_list'))
+            elif node.type == 'table':
+                children_list.append(parse_table(node))
+            elif node.type == 'fence':
+                children_list.append(parse_codeblock(node))
+            elif node.type == 'blockquote':
+                children_list.extend(
+                    [
+                        {
+                            'id': get_random_id(),
+                            'type': 'blockquote',
+                            'children': _parse_node(node),
+                        }
+                    ]
+                )
+            elif node.type == 'html_block':
+                children_list.append(
+                    {
+                        'type': 'paragraph',
+                        'children': parse_html_inline_block(node.content),
+                        'id': get_random_id(),
+                    }
+                )
+        return children_list
 
+    children_list = _parse_node(root)
     sdoc_json = {
         'cursors': {},
         'last_modify_user': username,
