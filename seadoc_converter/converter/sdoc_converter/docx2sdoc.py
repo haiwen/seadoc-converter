@@ -105,6 +105,9 @@ def parse_block_contents(items):
                         'children': [{'id': get_random_id(), 'text': ''}],
                         'data': {'src': img_path}
                     }
+                    if img := image_part.image:
+                        # 9525 is English Metric Units 2 Pixel
+                        img_struct['data']['width'] = int(img.width) / 9525
                     sdoc_children.extend([empty_elem, img_struct, empty_elem])
                 else:
                     logger.error(upload_link)
@@ -277,9 +280,9 @@ def docx2sdoc(docx, username, doc_uuid, **kwargs):
             children_list.append(parse_heading(block.iter_inner_content(), styles_map[style]))
         elif style == 'Normal':
             children_list.append(parse_paragraph(block.iter_inner_content()))
-        elif style == 'List Bullet':
+        elif style in {'List Bullet', 'List Paragraph'}:
             children_list.append(parse_list(block.iter_inner_content(), 'unordered_list'))
-        elif style == 'List Number':
+        elif style == {'List Number', 'List Paragraph'}:
             children_list.append(parse_list(block.iter_inner_content(), 'ordered_list'))        
         elif style == 'Normal Table':
             children_list.append(parse_table(block))

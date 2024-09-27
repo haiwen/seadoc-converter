@@ -12,6 +12,7 @@ from seadoc_converter import config
 from seadoc_converter.converter.sdoc_converter.docx2sdoc import docx2sdoc
 from seadoc_converter.converter.sdoc_converter.md2sdoc import md2sdoc
 from seadoc_converter.converter.markdown_converter import sdoc2md
+from seadoc_converter.converter.docx_converter import sdoc2docx
 
 logger = logging.getLogger(__name__)
 flask_app = Flask(__name__)

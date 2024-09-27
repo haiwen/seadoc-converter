@@ -1,4 +1,5 @@
 import uuid
+import xml.etree.ElementTree as ET
 
 from bs4 import BeautifulSoup
 from markdown_it import MarkdownIt
@@ -39,6 +40,8 @@ def parse_tokens(token_stream, **kwargs):
                 'data': {'src': token.attrs.get('src')}
             }
             sdoc_children.extend([empty_elem, img_struct, empty_elem])
+        elif token.type in {'html_block', 'html_inline'}:
+            sdoc_children.extend(parse_html_inline_block(token.content))
         else:
             sdoc_children.append({'id': get_random_id(), 'text': token.content, **kwargs})
     return sdoc_children
@@ -89,6 +92,7 @@ def parse_check_list(node):
     para_node = node.children[0].children[0]
     inline_node_list = para_node.children[0].children
     for inline in inline_node_list:
+        # Get is checked
         if inline.type == 'html_inline':
             html = inline.content
             soup = BeautifulSoup(html, 'html.parser')
@@ -103,6 +107,24 @@ def parse_check_list(node):
         'children': children_list,
         'checked': checked_status,
     }
+
+
+def parse_html_inline_block(html):
+    empty_elem = {'id': get_random_id(), 'text': ''}
+    element = ET.fromstring(html)
+
+    imgsrc = element.get('src')
+    width = element.get('width')
+    if imgsrc and width:
+        img_struct = {
+            'id': get_random_id(),
+            'type': 'image',
+            'children': [{'id': get_random_id(), 'text': ''}],
+            'data': {'src': imgsrc, 'width': width}
+        }
+        return [empty_elem, img_struct, empty_elem]
+    else:
+        return [empty_elem]
 
 
 def parse_table(node):
@@ -184,6 +206,14 @@ def md2sdoc(md_txt, username=''):
             children_list.append(parse_table(node))
         elif node.type == 'fence':
             children_list.append(parse_codeblock(node))
+        elif node.type == 'html_block':
+            children_list.append(
+                {
+                    'type': 'paragraph',
+                    'children': parse_html_inline_block(node.content),
+                    'id': get_random_id(),
+                }
+            )
 
     sdoc_json = {
         'cursors': {},
