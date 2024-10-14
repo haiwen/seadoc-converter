@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from markdown_it import MarkdownIt
 from markdown_it.tree import SyntaxTreeNode
 from mdit_py_plugins.tasklists import tasklists_plugin
+from mdit_py_plugins.dollarmath import dollarmath_plugin
 
 
 def get_random_id():
@@ -19,6 +20,9 @@ def parse_tokens(token_stream, **kwargs):
         if token.type == 'text':
             text = token.content
             sdoc_children.append({'id': get_random_id(), 'text': text, **kwargs})
+        elif token.type == 'code_inline':
+            text = token.content
+            sdoc_children.append({'id': get_random_id(), 'text': text, 'code': True, **kwargs})
         elif token.type == 'em':
             sdoc_children.extend(parse_tokens(token.children, italic=True, **kwargs))
         elif token.type == 'strong':
@@ -66,6 +70,11 @@ def parse_paragraph(node):
         'children': sdoc_children,
         'id': get_random_id()
     }
+
+
+def parse_math(node):
+    sdoc_children = [{'id': get_random_id(), 'text': node.content}]
+    return {'type': 'paragraph', 'children': sdoc_children, 'id': get_random_id()}
 
 
 def parse_list(node, list_type):
@@ -185,7 +194,7 @@ def parse_codeblock(node):
 
 
 def md2sdoc(md_txt, username=''):
-    md = MarkdownIt("gfm-like").use(tasklists_plugin)
+    md = MarkdownIt("gfm-like").use(tasklists_plugin).use(dollarmath_plugin)
     tokens = md.parse(md_txt)
     root = SyntaxTreeNode(tokens).children
 
@@ -196,6 +205,8 @@ def md2sdoc(md_txt, username=''):
                 children_list.append(parse_header(node))
             elif node.type == 'paragraph':
                 children_list.append(parse_paragraph(node))
+            elif node.type == 'math_block':
+                children_list.append(parse_math(node))
             elif node.type == 'bullet_list':
                 if node.attrs.get('class') == 'contains-task-list':
                     children_list.append(parse_check_list(node))
