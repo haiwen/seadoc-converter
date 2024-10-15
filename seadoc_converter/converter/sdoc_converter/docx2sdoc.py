@@ -17,6 +17,7 @@ from docx.table import _Cell, Table
 from docx.text.paragraph import Paragraph
 from docx.text.run import Run
 from docx.text.hyperlink import Hyperlink
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 from seadoc_converter.config import SEAHUB_SERVICE_URL
 from seadoc_converter.converter.utils import gen_jwt_auth_header
@@ -145,25 +146,30 @@ def parse_block_contents(items):
     return sdoc_children
 
 
-def parse_heading(content_items, header_level):
-    sdoc_children = parse_block_contents(content_items)
+def parse_heading(block, header_level):
+    align = parse_alignment(block)
+    sdoc_children = parse_block_contents(block.iter_inner_content())
     return {
         'type': header_level,
         'children': sdoc_children,
-        'id': get_random_id()
+        'id': get_random_id(),
+        **(align if align else {})
     }
 
 
-def parse_paragraph(content_items):
-    sdoc_children = parse_block_contents(content_items)
+def parse_paragraph(block):
+    align = parse_alignment(block)
+    sdoc_children = parse_block_contents(block.iter_inner_content())
     return {
         'type': 'paragraph',
         'children': sdoc_children,
-        'id': get_random_id()
+        'id': get_random_id(),
+        **(align if align else {})
     }
 
 
-def parse_list(content_items, list_type):
+def parse_list(block, list_type):
+    align = parse_alignment(block)
     children_list = [
         {
             'id': get_random_id(),
@@ -172,11 +178,16 @@ def parse_list(content_items, list_type):
                 [{
                 'id': get_random_id(),
                 'type': 'paragraph',
-                'children': parse_block_contents(content_items)
+                'children': parse_block_contents(block.iter_inner_content())
             }]
         }
     ]
-    return {'type': list_type, 'id': get_random_id(), 'children': children_list}
+    return {
+        'type': list_type,
+        'id': get_random_id(),
+        'children': children_list,
+        **(align if align else {}),
+    }
 
 
 def parse_table(table):
@@ -211,13 +222,19 @@ def parse_table(table):
     return table_sdoc
 
 
-def parse_quote(content_items):
+def parse_quote(block):
+    align = parse_alignment(block)
     children_sdoc = [{
         'id': get_random_id(),
         'type': 'paragraph',
-        'children': parse_block_contents(content_items)
+        'children': parse_block_contents(block.iter_inner_content())
     }]
-    return {'id': get_random_id(), 'type': 'blockquote', 'children': children_sdoc}
+    return {
+        'id': get_random_id(),
+        'type': 'blockquote',
+        'children': children_sdoc,
+        **(align if align else {}),
+    }
 
 
 def merge_ordered_lists(children_list):
@@ -251,6 +268,19 @@ def merge_ordered_lists(children_list):
     return merged_list
 
 
+def parse_alignment(block):
+    if not hasattr(block, 'alignment'):
+        return None
+    if block.alignment == WD_ALIGN_PARAGRAPH.LEFT:
+        return {'align': 'left'}
+    elif block.alignment == WD_ALIGN_PARAGRAPH.CENTER:
+        return {'align': 'center'}
+    elif block.alignment == WD_ALIGN_PARAGRAPH.RIGHT:
+        return {'align': 'right'}
+    else:
+        return None
+
+
 def docx2sdoc(docx, username, doc_uuid, **kwargs):
     children_list = []
     # Fix according to: https://github.com/python-openxml/python-docx/issues/1105s
@@ -275,19 +305,20 @@ def docx2sdoc(docx, username, doc_uuid, **kwargs):
         'Heading 9': 'header6',
     }
     for block in iter_block_items(doc):
-        style = block.style.name
-        if style in styles_map:
-            children_list.append(parse_heading(block.iter_inner_content(), styles_map[style]))
-        elif style == 'Normal':
-            children_list.append(parse_paragraph(block.iter_inner_content()))
-        elif style in {'List Bullet', 'List Paragraph'}:
-            children_list.append(parse_list(block.iter_inner_content(), 'unordered_list'))
-        elif style == {'List Number', 'List Paragraph'}:
-            children_list.append(parse_list(block.iter_inner_content(), 'ordered_list'))        
-        elif style == 'Normal Table':
+        style = block.style
+        style_name = block.style.name
+        if style_name in styles_map:
+            children_list.append(parse_heading(block, styles_map[style_name]))
+        elif style_name == 'Normal':
+            children_list.append(parse_paragraph(block))
+        elif style_name in {'List Bullet', 'List Paragraph'}:
+            children_list.append(parse_list(block, 'unordered_list'))
+        elif style_name == {'List Number', 'List Paragraph'}:
+            children_list.append(parse_list(block, 'ordered_list'))        
+        elif style_name == 'Normal Table' or style.base_style.name == 'Normal Table':
             children_list.append(parse_table(block))
-        elif style == 'Quote':
-            children_list.append(parse_quote(block.iter_inner_content()))
+        elif style_name == 'Quote':
+            children_list.append(parse_quote(block))
 
     children_list = merge_ordered_lists(children_list)
     sdoc_json = {
