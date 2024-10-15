@@ -23,11 +23,6 @@ from seadoc_converter.config import SEAHUB_SERVICE_URL
 from seadoc_converter.converter.utils import gen_jwt_auth_header
 
 
-# Global
-doc = None
-g_doc_uuid = None
-
-
 logger = logging.getLogger(__name__)
 
 
@@ -75,7 +70,7 @@ def iter_block_items(parent):
             yield Table(child, parent)
 
 
-def parse_block_contents(items):
+def parse_block_contents(items, docx, docx_uuid):
     empty_elem = {'id': get_random_id(), 'text': ''}
     sdoc_children = []
     for item in items:
@@ -89,12 +84,12 @@ def parse_block_contents(items):
                     name_attr = cNvPr_elem.get("name")
                     blip_elem = pic.find("pic:blipFill/a:blip", my_namespaces)
                     embed_attr = blip_elem.get('{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed')
-                document_part = doc.part
+                document_part = docx.part
                 image_part = document_part.related_parts[embed_attr]
 
-                upload_link = f"{SEAHUB_SERVICE_URL}/api/v2.1/seadoc/upload-image/{g_doc_uuid}/"
+                upload_link = f"{SEAHUB_SERVICE_URL}/api/v2.1/seadoc/upload-image/{docx_uuid}/"
                 headers = gen_jwt_auth_header({
-                    'file_uuid': g_doc_uuid,
+                    'file_uuid': docx_uuid,
                 })
                 resp = requests.post(upload_link, headers=headers,
                                         files={'file': (f'{get_image_name()}-{name_attr}.png', image_part._blob)})
@@ -146,9 +141,9 @@ def parse_block_contents(items):
     return sdoc_children
 
 
-def parse_heading(block, header_level):
+def parse_heading(block, header_level, docx, docx_uuid):
     align = parse_alignment(block)
-    sdoc_children = parse_block_contents(block.iter_inner_content())
+    sdoc_children = parse_block_contents(block.iter_inner_content(), docx, docx_uuid)
     return {
         'type': header_level,
         'children': sdoc_children,
@@ -157,9 +152,9 @@ def parse_heading(block, header_level):
     }
 
 
-def parse_paragraph(block):
+def parse_paragraph(block, docx, docx_uuid):
     align = parse_alignment(block)
-    sdoc_children = parse_block_contents(block.iter_inner_content())
+    sdoc_children = parse_block_contents(block.iter_inner_content(), docx, docx_uuid)
     return {
         'type': 'paragraph',
         'children': sdoc_children,
@@ -168,7 +163,7 @@ def parse_paragraph(block):
     }
 
 
-def parse_list(block, list_type):
+def parse_list(block, list_type, docx, docx_uuid):
     align = parse_alignment(block)
     children_list = [
         {
@@ -178,7 +173,7 @@ def parse_list(block, list_type):
                 [{
                 'id': get_random_id(),
                 'type': 'paragraph',
-                'children': parse_block_contents(block.iter_inner_content())
+                'children': parse_block_contents(block.iter_inner_content(), docx, docx_uuid)
             }]
         }
     ]
@@ -190,7 +185,7 @@ def parse_list(block, list_type):
     }
 
 
-def parse_table(table):
+def parse_table(table, docx, docx_uuid):
     children_list = []
     column_count = len(table.columns)
     column_width = int(672 / column_count)
@@ -210,7 +205,7 @@ def parse_table(table):
         }
         for cell in row.cells:
             para = cell.paragraphs[0]
-            cell_content = parse_block_contents(para.iter_inner_content())
+            cell_content = parse_block_contents(para.iter_inner_content(), docx, docx_uuid)
             table_cell = {
                 'id': get_random_id(),
                 'type': 'table_cell',
@@ -222,12 +217,12 @@ def parse_table(table):
     return table_sdoc
 
 
-def parse_quote(block):
+def parse_quote(block, docx, docx_uuid):
     align = parse_alignment(block)
     children_sdoc = [{
         'id': get_random_id(),
         'type': 'paragraph',
-        'children': parse_block_contents(block.iter_inner_content())
+        'children': parse_block_contents(block.iter_inner_content(), docx, docx_uuid)
     }]
     return {
         'id': get_random_id(),
@@ -281,15 +276,12 @@ def parse_alignment(block):
         return None
 
 
-def docx2sdoc(docx, username, doc_uuid, **kwargs):
+def docx2sdoc(docx, username, docx_uuid):
     children_list = []
     # Fix according to: https://github.com/python-openxml/python-docx/issues/1105s
     _SerializedRelationships.load_from_xml = load_from_xml_v2
 
-    global doc
-    global g_doc_uuid
-    g_doc_uuid = doc_uuid
-    doc = Document(BytesIO(docx))
+    docx = Document(BytesIO(docx))
 
     styles_map = {
         'Title': 'title',
@@ -304,21 +296,21 @@ def docx2sdoc(docx, username, doc_uuid, **kwargs):
         'Heading 8': 'header6',
         'Heading 9': 'header6',
     }
-    for block in iter_block_items(doc):
+    for block in iter_block_items(docx):
         style = block.style
         style_name = block.style.name
         if style_name in styles_map:
-            children_list.append(parse_heading(block, styles_map[style_name]))
+            children_list.append(parse_heading(block, styles_map[style_name], docx, docx_uuid))
         elif style_name == 'Normal':
-            children_list.append(parse_paragraph(block))
+            children_list.append(parse_paragraph(block, docx, docx_uuid))
         elif style_name in {'List Bullet', 'List Paragraph'}:
-            children_list.append(parse_list(block, 'unordered_list'))
+            children_list.append(parse_list(block, 'unordered_list', docx, docx_uuid))
         elif style_name == {'List Number', 'List Paragraph'}:
-            children_list.append(parse_list(block, 'ordered_list'))        
+            children_list.append(parse_list(block, 'ordered_list', docx, docx_uuid))        
         elif style_name == 'Normal Table' or style.base_style.name == 'Normal Table':
-            children_list.append(parse_table(block))
+            children_list.append(parse_table(block, docx, docx_uuid))
         elif style_name == 'Quote':
-            children_list.append(parse_quote(block))
+            children_list.append(parse_quote(block, docx, docx_uuid))
 
     children_list = merge_ordered_lists(children_list)
     sdoc_json = {
