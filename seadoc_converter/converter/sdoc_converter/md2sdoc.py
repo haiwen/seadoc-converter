@@ -81,17 +81,23 @@ def parse_list(node, list_type):
     item_list = node.children
     children_list = []
     for item in item_list:
-        para_node = item.children[0]
-        inline_elem = para_node.children[0]
-        children_list.append({
+        parsed_item = {
             'id': get_random_id(),
             'type': 'list_item',
-            'children': [{
-                'id': get_random_id(),
-                'type': 'paragraph',
-                'children': parse_tokens(inline_elem.children)
-            }]
-        })
+            'children': []
+        }
+        for child in item.children:
+            if child.type == 'paragraph':
+                inline_elem = child.children[0]
+                parsed_item['children'].append({
+                    'id': get_random_id(),
+                    'type': 'paragraph',
+                    'children': parse_tokens(inline_elem.children)
+                })
+            elif child.type in {'bullet_list', 'ordered_list'}:
+                list_type_map = {'bullet_list': 'unordered_list'}.get(child.type, child.type)
+                parsed_item['children'].append(parse_list(child, list_type_map))
+        children_list.append(parsed_item)
     return {'type': list_type, 'id': get_random_id(), 'children': children_list}
 
 
