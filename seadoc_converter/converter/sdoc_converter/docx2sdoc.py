@@ -194,8 +194,20 @@ def _get_numFmt(numbering_xml, num_id, ilvlid):
 
 
 def parse_list(block, numbering_xml, docx, docx_uuid):
-    num_id = block._element.pPr.numPr.numId.val
-    ilvl_id = block._element.pPr.numPr.ilvl.val
+    if block._element.pPr.numPr is not None:
+        num_id = block._element.pPr.numPr.numId.val
+    elif block.style._element.pPr.numPr is not None:
+        num_id = block.style._element.pPr.numPr.numId.val
+    else:
+        return parse_paragraph(block, docx, docx_uuid)
+
+    if block._element.pPr.numPr is not None:
+        ilvl_id = block._element.pPr.numPr.ilvl.val
+    elif block.style._element.pPr.numPr is not None:
+        ilvl_id = block.style._element.pPr.numPr.ilvl.val
+    else:
+        return parse_paragraph(block, docx, docx_uuid)
+
     num_fmt = _get_numFmt(numbering_xml, num_id, ilvl_id)
     if num_fmt in {'decimal', 'lowerLetter', 'lowerRoman', 'upperLetter', 'upperRoman'}:
         list_type = 'ordered_list'
@@ -289,6 +301,10 @@ def build_nested_list(children_list):
             num_id = child.pop('num_id')
             ilvl_id = child.pop('ilvl_id')
             if current_num_id != num_id:
+                if current_num_id is not None:
+                    current_num_id = None
+                    ilvl_id_set = {-1, 0}
+                    elements.extend(root.get('children'))
                 root = {'type': 'root', 'children': []}
                 root['children'].append(child)
                 stack.append((root, -1))
@@ -311,6 +327,7 @@ def build_nested_list(children_list):
         elements.extend(root.get('children'))
     return elements
 
+
 def parse_alignment(block):
     if not hasattr(block, 'alignment'):
         return None
@@ -330,7 +347,10 @@ def docx2sdoc(docx, username, docx_uuid):
     _SerializedRelationships.load_from_xml = load_from_xml_v2
 
     docx = Document(BytesIO(docx))
-    numbering_xml = docx.part.numbering_part.element.xml
+    try:
+        numbering_xml = docx.part.numbering_part.element.xml
+    except (KeyError, NotImplementedError):
+        numbering_xml = None
     styles_map = {
         'Title': 'title',
         'Subtitle': 'subtitle',
