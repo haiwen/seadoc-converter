@@ -5,7 +5,6 @@ import logging
 import xml.etree.ElementTree as ET
 
 from io import BytesIO, StringIO
-from xml.etree import ElementTree
 
 from docx import Document
 from docx.opc.pkgreader import _SerializedRelationships, _SerializedRelationship
@@ -77,7 +76,7 @@ def parse_block_contents(items, docx, docx_uuid):
         if isinstance(item, Run):
             xmlstr = str(item.element.xml)
             if 'pic:pic' in xmlstr:
-                my_namespaces = dict([node for _, node in ElementTree.iterparse(StringIO(xmlstr), events=['start-ns'])])
+                my_namespaces = dict([node for _, node in ET.iterparse(StringIO(xmlstr), events=['start-ns'])])
                 root = ET.fromstring(xmlstr)
                 for pic in root.findall('.//pic:pic', my_namespaces):
                     cNvPr_elem = pic.find("pic:nvPicPr/pic:cNvPr", my_namespaces)
@@ -163,7 +162,45 @@ def parse_paragraph(block, docx, docx_uuid):
     }
 
 
-def parse_list(block, list_type, docx, docx_uuid):
+def _get_numFmt(numbering_xml, num_id, ilvlid):
+    # Parse the XML
+    root = ET.fromstring(numbering_xml)
+    namespace = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
+
+    # Find the <w:num> element with the given numId
+    num_element = root.find(f".//w:num[@w:numId='{num_id}']", namespace)
+    if num_element is None:
+        return None
+
+    # Get the abstractNumId value from the <w:num> element
+    abstract_num_id = num_element.find("w:abstractNumId", namespace).get("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val")
+
+    # Find the corresponding <w:abstractNum> element with the abstractNumId
+    abstract_num_element = root.find(f".//w:abstractNum[@w:abstractNumId='{abstract_num_id}']", namespace)
+    if abstract_num_element is None:
+        return None
+
+    # Find the <w:lvl> element with the given ilvlid
+    lvl_element = abstract_num_element.find(f".//w:lvl[@w:ilvl='{ilvlid}']", namespace)
+    if lvl_element is None:
+        return None
+
+    # Get the numFmt value from the <w:lvl> element
+    num_fmt = lvl_element.find("w:numFmt", namespace)
+    if num_fmt is not None:
+        return num_fmt.get("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val")
+    else:
+        return None
+
+
+def parse_list(block, numbering_xml, docx, docx_uuid):
+    num_id = block._element.pPr.numPr.numId.val
+    ilvl_id = block._element.pPr.numPr.ilvl.val
+    num_fmt = _get_numFmt(numbering_xml, num_id, ilvl_id)
+    if num_fmt in {'decimal', 'lowerLetter', 'lowerRoman', 'upperLetter', 'upperRoman'}:
+        list_type = 'ordered_list'
+    else:
+        list_type = 'unordered_list'
     align = parse_alignment(block)
     children_list = [
         {
@@ -178,6 +215,8 @@ def parse_list(block, list_type, docx, docx_uuid):
         }
     ]
     return {
+        'num_id': num_id,
+        'ilvl_id': ilvl_id,
         'type': list_type,
         'id': get_random_id(),
         'children': children_list,
@@ -232,36 +271,45 @@ def parse_quote(block, docx, docx_uuid):
     }
 
 
-def merge_ordered_lists(children_list):
-    merged_list = []
-    current_child = None
-
+def build_nested_list(children_list):
+    elements = []
+    root = {'type': 'root', 'children': []}
+    stack = []
+    current_num_id = None
+    ilvl_id_set = {-1, 0}
     for child in children_list:
-        if child['type'] == 'unordered_list':
-            if current_child and current_child['type'] == 'unordered_list':
-                current_child['children'].extend(child['children'])
-            else:
-                if current_child:
-                    merged_list.append(current_child)
-                current_child = child
-        elif child['type'] == 'ordered_list':
-            if current_child and current_child['type'] == 'ordered_list':
-                current_child['children'].extend(child['children'])
-            else:
-                if current_child:
-                    merged_list.append(current_child)
-                current_child = child
+        if child['type'] not in {'ordered_list', 'unordered_list'}:
+            if current_num_id is not None:
+                current_num_id = None
+                ilvl_id_set = {-1, 0}
+                elements.extend(root.get('children'))
+            elements.append(child)
+            continue
         else:
-            if current_child:
-                merged_list.append(current_child)
-                current_child = None
-            merged_list.append(child)
-
-    if current_child:
-        merged_list.append(current_child)
-
-    return merged_list
-
+            num_id = child.pop('num_id')
+            ilvl_id = child.pop('ilvl_id')
+            if current_num_id != num_id:
+                root = {'type': 'root', 'children': []}
+                root['children'].append(child)
+                stack.append((root, -1))
+                stack.append((child, ilvl_id))
+                current_num_id = num_id
+            else:
+                while stack and stack[-1][1] >= ilvl_id:
+                    stack.pop()
+                parent_node, _ = stack[-1]
+                if ilvl_id in ilvl_id_set:
+                    if parent_node['type'] == 'root':
+                        parent_node['children'][0]['children'].append(child['children'][0])
+                    else:
+                        parent_node['children'][0]['children'][-1]['children'].append(child['children'][0])
+                else:
+                     parent_node['children'][0]['children'].append(child)
+                     ilvl_id_set.add(int(ilvl_id))
+                stack.append((child, ilvl_id))
+    if current_num_id is not None:
+        elements.extend(root.get('children'))
+    return elements
 
 def parse_alignment(block):
     if not hasattr(block, 'alignment'):
@@ -282,7 +330,7 @@ def docx2sdoc(docx, username, docx_uuid):
     _SerializedRelationships.load_from_xml = load_from_xml_v2
 
     docx = Document(BytesIO(docx))
-
+    numbering_xml = docx.part.numbering_part.element.xml
     styles_map = {
         'Title': 'title',
         'Subtitle': 'subtitle',
@@ -303,16 +351,14 @@ def docx2sdoc(docx, username, docx_uuid):
             children_list.append(parse_heading(block, styles_map[style_name], docx, docx_uuid))
         elif style_name == 'Normal':
             children_list.append(parse_paragraph(block, docx, docx_uuid))
-        elif style_name in {'List Bullet', 'List Paragraph'}:
-            children_list.append(parse_list(block, 'unordered_list', docx, docx_uuid))
-        elif style_name == {'List Number', 'List Paragraph'}:
-            children_list.append(parse_list(block, 'ordered_list', docx, docx_uuid))        
+        elif style_name.startswith('List'):
+            children_list.append(parse_list(block, numbering_xml, docx, docx_uuid))        
         elif style_name == 'Normal Table' or style.base_style.name == 'Normal Table':
             children_list.append(parse_table(block, docx, docx_uuid))
         elif style_name == 'Quote':
             children_list.append(parse_quote(block, docx, docx_uuid))
 
-    children_list = merge_ordered_lists(children_list)
+    children_list = build_nested_list(children_list)
     sdoc_json = {
         'cursors': {},
         'last_modify_user': username,
