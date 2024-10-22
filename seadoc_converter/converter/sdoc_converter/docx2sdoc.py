@@ -136,7 +136,7 @@ def parse_block_contents(items, docx, docx_uuid):
                     }
                 ]
             }
-            sdoc_children.extend([empty_elem, link_struct, empty_elem])       
+            sdoc_children.extend([empty_elem, link_struct, empty_elem])
     return sdoc_children
 
 
@@ -218,7 +218,7 @@ def parse_list(block, numbering_xml, docx, docx_uuid):
         {
             'id': get_random_id(),
             'type': 'list_item',
-            'children': 
+            'children':
                 [{
                 'id': get_random_id(),
                 'type': 'paragraph',
@@ -367,23 +367,26 @@ def docx2sdoc(docx, username, docx_uuid):
     for block in iter_block_items(docx):
         style = block.style
         style_name = block.style.name
+        node = {}
         if style_name in styles_map:
-            children_list.append(parse_heading(block, styles_map[style_name], docx, docx_uuid))
+            node = parse_heading(block, styles_map[style_name], docx, docx_uuid)
         elif style_name == 'Normal':
-            children_list.append(parse_paragraph(block, docx, docx_uuid))
+            node = parse_paragraph(block, docx, docx_uuid)
         elif style_name.startswith('List'):
-            children_list.append(parse_list(block, numbering_xml, docx, docx_uuid))        
+            node = parse_list(block, numbering_xml, docx, docx_uuid)
         elif style_name == 'Normal Table' or style.base_style.name == 'Normal Table':
-            children_list.append(parse_table(block, docx, docx_uuid))
+            node = parse_table(block, docx, docx_uuid)
         elif style_name == 'Quote':
-            children_list.append(parse_quote(block, docx, docx_uuid))
+            node = parse_quote(block, docx, docx_uuid)
+        if node and node.get('children'):
+            children_list.append(node)
 
     children_list = build_nested_list(children_list)
     sdoc_json = {
         'cursors': {},
         'last_modify_user': username,
-        'children': children_list,
+        'elements': children_list,
         'version': 1,
-        'format_version': 2,
+        'format_version': 4,
     }
     return sdoc_json

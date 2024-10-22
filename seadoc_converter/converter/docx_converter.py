@@ -114,17 +114,19 @@ def sdoc2docx(file_content_json, file_uuid, username):
                 for children in children_list:
                     current_type = children.get('type', 'no type')
                     sub_children_list = children.get('children', [])
-                    search_sdoc_node_recursively(sub_children_list,
+                    if sub_children_list:
+                        search_sdoc_node_recursively(sub_children_list,
                                                  type_sq + [current_type],
                                                  top_type=top_type, top_style=top_style)
 
-    sdoc_node_list = file_content_json.get('children', [])
+    sdoc_node_list = file_content_json.get('elements', [])
     type_content_list = []
     for sdoc_node in sdoc_node_list:
         top_sdoc_type = sdoc_node.get('type', '')
-        children_list = sdoc_node.get('children', '')
+        children_list = sdoc_node.get('children', [])
         style = sdoc_node.get('style', '')
-        search_sdoc_node_recursively(children_list, top_type=top_sdoc_type, top_style=style)
+        if children_list:
+            search_sdoc_node_recursively(children_list, top_type=top_sdoc_type, top_style=style)
 
     document = Document()
 

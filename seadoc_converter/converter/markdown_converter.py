@@ -295,7 +295,7 @@ def json2md(json_data, doc_uuid=''):
 
 def sdoc2md(json_tree, doc_uuid=''):
     results = []
-    for sub in json_tree.get('children'):
+    for sub in json_tree.get('elements'):
         results.append(json2md(sub, doc_uuid))
 
     markdown_text = "\n".join(results)
