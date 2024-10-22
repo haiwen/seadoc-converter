@@ -248,8 +248,8 @@ def md2sdoc(md_txt, username=''):
     sdoc_json = {
         'cursors': {},
         'last_modify_user': username,
-        'children': children_list,
+        'elements': children_list,
         'version': 1,
-        'format_version': 2,
+        'format_version': 4,
     }
     return sdoc_json
