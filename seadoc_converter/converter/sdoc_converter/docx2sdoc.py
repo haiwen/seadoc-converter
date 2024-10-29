@@ -110,15 +110,23 @@ def parse_block_contents(items, docx, docx_uuid):
                     logger.error(resp.__dict__)
 
             if text := item.text:
-                sdoc_children.append(
-                    {
-                        'id': get_random_id(),
-                        'text': text,
-                        'bold': getattr(item, 'bold', False),
-                        'italic': getattr(item, 'italic', False),
-                        'underline': getattr(item, 'underline', False),
-                    }
-                )
+                text_attr = {
+                    'id': get_random_id(),
+                    'text': text,
+                    'bold': getattr(item, 'bold', False),
+                    'italic': getattr(item, 'italic', False),
+                    'underline': getattr(item, 'underline', False),
+                }
+                if hasattr(item, 'font'):
+                    if item.font.name:
+                        text_attr['font'] = item.font.name
+                    if item.font.size:
+                        text_attr['font_size'] = item.font.size.pt
+                    if item.font.color.rgb:
+                        rgb_color = item.font.color.rgb
+                        hex_color = f'#{rgb_color[0]:02X}{rgb_color[1]:02X}{rgb_color[2]:02X}'
+                        text_attr['color'] = hex_color
+                sdoc_children.append(text_attr)
         elif isinstance(item, Hyperlink):
             run = item.runs[0]
             link_struct = {
