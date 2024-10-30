@@ -87,7 +87,7 @@ def sdoc2docx(file_content_json, file_uuid, username):
                 text_list.extend(extract_text_in_table_recursively(item))
         elif isinstance(data, dict):
             if 'text' in data:
-                text_list.append(data['text'])
+                text_list.append(data)
             for key, value in data.items():
                 text_list.extend(extract_text_in_table_recursively(value))
 
@@ -269,19 +269,26 @@ def sdoc2docx(file_content_json, file_uuid, username):
                 logger.exception(f'can not get image content: {file_uuid} {image_file_path}')
 
         elif sdoc_type == 'table':
-
             # add table to docx
 
-            # ['table', [['1', '2', '3', '4'], ['a', 'b', 'c', 'd']]]
-
             table = document.add_table(rows=len(content), cols=len(content[0]))
+            for i, row in enumerate(table.rows):
+                for j, cell in enumerate(row.cells):
+                    cell_info = content[i][j]
+                    paragraph = cell.paragraphs[0]
+                    run = paragraph.add_run(cell_info.get('text', ''))
 
-            def fulfill_table(table, content):
-                for i, row in enumerate(content):
-                    for j, value in enumerate(row):
-                        table.cell(i, j).text = value
-
-            fulfill_table(table, content)
+                    bold = cell_info.get('bold', False)
+                    run.bold = True if bold else False
+                    italic = cell_info.get('italic', False)
+                    run.italic = True if italic else False
+                    if hex_color := cell_info.get('color', None):
+                        rgb_color = hex_to_rgb(hex_color)
+                        run.font.color.rgb = RGBColor(*rgb_color)
+                    if font_name := cell_info.get('font', None):
+                        run.font.name = font_name
+                    if font_size := cell_info.get('font_size', None):  
+                        run.font.size = Pt(font_size)
 
         elif sdoc_type == 'callout':
 
