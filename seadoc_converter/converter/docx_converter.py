@@ -5,7 +5,7 @@ import logging
 import requests
 
 from docx import Document
-from docx.shared import Pt, Inches
+from docx.shared import Pt, Inches, RGBColor
 from docx.oxml.ns import qn
 from docx.oxml.shared import OxmlElement
 
@@ -31,6 +31,11 @@ def get_image_content_url(file_uuid, image_name):
     else:
         logger.error(resp.__dict__)
         return ""
+
+
+def hex_to_rgb(hex_color):
+    hex_color = hex_color.lstrip('#')
+    return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
 
 
 def sdoc2docx(file_content_json, file_uuid, username):
@@ -305,6 +310,13 @@ def sdoc2docx(file_content_json, file_uuid, username):
                 run.bold = True if bold else False
                 italic = text_dict.get('italic', False)
                 run.italic = True if italic else False
+                if hex_color := text_dict.get('color', None):
+                    rgb_color = hex_to_rgb(hex_color)
+                    run.font.color.rgb = RGBColor(*rgb_color)
+                if font_name := text_dict.get('font', None):
+                    run.font.name = font_name
+                if font_size := text_dict.get('font_size', None):  
+                    run.font.size = Pt(font_size)
         else:
 
             for text_dict in content:
@@ -317,6 +329,13 @@ def sdoc2docx(file_content_json, file_uuid, username):
 
                 italic = text_dict.get('italic', False)
                 run.italic = True if italic else False
+                if hex_color := text_dict.get('color', None):
+                    rgb_color = hex_to_rgb(hex_color)
+                    run.font.color.rgb = RGBColor(*rgb_color)
+                if font_name := text_dict.get('font', None):
+                    run.font.name = font_name
+                if font_size := text_dict.get('font_size', None):  
+                    run.font.size = Pt(font_size)
 
     memory_stream = io.BytesIO()
     document.save(memory_stream)
