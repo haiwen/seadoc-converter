@@ -79,20 +79,6 @@ def sdoc2docx(file_content_json, file_uuid, username):
 
         return hyperlink
 
-    def extract_text_in_table_recursively(data):
-
-        text_list = []
-        if isinstance(data, list):
-            for item in data:
-                text_list.extend(extract_text_in_table_recursively(item))
-        elif isinstance(data, dict):
-            if 'text' in data:
-                text_list.append(data)
-            for key, value in data.items():
-                text_list.extend(extract_text_in_table_recursively(value))
-
-        return text_list
-
     def search_sdoc_node_recursively(children_list, type_sq=[], top_type='', top_style=''):
 
         if 'text' in children_list[0]:
@@ -108,13 +94,15 @@ def sdoc2docx(file_content_json, file_uuid, username):
                 type_content_list.append([top_type, children_list, top_style])
         else:
             if top_type == 'table':
-                table_text_list = extract_text_in_table_recursively(children_list)
-                sub_length = len(children_list[0]['children'])
-                new_table_text_list = []
-                for i in range(0, len(table_text_list), sub_length):
-                    new_table_text_list.append(table_text_list[i:i + sub_length])
+                table_runs = []
+                for row in children_list:
+                    row_data = []
+                    for cell in row["children"]:
+                        cell_data = cell["children"]
+                        row_data.append(cell_data)
+                    table_runs.append(row_data)
 
-                type_content_list.append([top_type, new_table_text_list, top_style])
+                type_content_list.append([top_type, table_runs, top_style])
             else:
                 for children in children_list:
                     current_type = children.get('type', 'no type')
@@ -275,20 +263,23 @@ def sdoc2docx(file_content_json, file_uuid, username):
             for i, row in enumerate(table.rows):
                 for j, cell in enumerate(row.cells):
                     cell_info = content[i][j]
-                    paragraph = cell.paragraphs[0]
-                    run = paragraph.add_run(cell_info.get('text', ''))
+                    paragraph = (
+                        cell.paragraphs[0] if cell.paragraphs else cell.add_paragraph()
+                    )
 
-                    bold = cell_info.get('bold', False)
-                    run.bold = True if bold else False
-                    italic = cell_info.get('italic', False)
-                    run.italic = True if italic else False
-                    if hex_color := cell_info.get('color', None):
-                        rgb_color = hex_to_rgb(hex_color)
-                        run.font.color.rgb = RGBColor(*rgb_color)
-                    if font_name := cell_info.get('font', None):
-                        run.font.name = font_name
-                    if font_size := cell_info.get('font_size', None):  
-                        run.font.size = Pt(font_size)
+                    for cell_run in cell_info:
+                        run = paragraph.add_run(cell_run.get('text', ''))
+                        bold = cell_run.get('bold', False)
+                        run.bold = True if bold else False
+                        italic = cell_run.get('italic', False)
+                        run.italic = True if italic else False
+                        if hex_color := cell_run.get('color', None):
+                            rgb_color = hex_to_rgb(hex_color)
+                            run.font.color.rgb = RGBColor(*rgb_color)
+                        if font_name := cell_run.get('font', None):
+                            run.font.name = font_name
+                        if font_size := cell_run.get('font_size', None):  
+                            run.font.size = Pt(font_size)
 
         elif sdoc_type == 'callout':
 
