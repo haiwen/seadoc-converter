@@ -278,6 +278,7 @@ def sdoc2docx(file_content_json, file_uuid, username):
                             run.font.color.rgb = RGBColor(*rgb_color)
                         if font_name := cell_run.get('font', None):
                             run.font.name = font_name
+                            run._element.rPr.rFonts.set(qn('w:eastAsia'), font_name)
                         if font_size := cell_run.get('font_size', None):  
                             run.font.size = Pt(font_size)
 
@@ -313,6 +314,7 @@ def sdoc2docx(file_content_json, file_uuid, username):
                     run.font.color.rgb = RGBColor(*rgb_color)
                 if font_name := text_dict.get('font', None):
                     run.font.name = font_name
+                    run._element.rPr.rFonts.set(qn('w:eastAsia'), font_name)
                 if font_size := text_dict.get('font_size', None):  
                     run.font.size = Pt(font_size)
         else:
@@ -332,6 +334,7 @@ def sdoc2docx(file_content_json, file_uuid, username):
                     run.font.color.rgb = RGBColor(*rgb_color)
                 if font_name := text_dict.get('font', None):
                     run.font.name = font_name
+                    run._element.rPr.rFonts.set(qn('w:eastAsia'), font_name)
                 if font_size := text_dict.get('font_size', None):  
                     run.font.size = Pt(font_size)
 
