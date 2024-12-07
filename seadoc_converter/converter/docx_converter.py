@@ -3,6 +3,7 @@ import io
 import docx
 import logging
 import requests
+import time
 
 from docx import Document
 from docx.shared import Pt, Inches, RGBColor
@@ -19,7 +20,10 @@ DEFAULT_CALLOUT_COLOR = 'fef7e0'
 
 def get_image_content_url(file_uuid, image_name):
 
-    payload = {'file_uuid': file_uuid}
+    payload = {
+        'file_uuid': file_uuid,
+        'exp': int(time.time()) + 300
+    }
 
     url = f'{SEAHUB_SERVICE_URL}/api/v2.1/seadoc/image-download-link/{file_uuid}/'
     params = {'image_name': image_name}
@@ -279,7 +283,7 @@ def sdoc2docx(file_content_json, file_uuid, username):
                         if font_name := cell_run.get('font', None):
                             run.font.name = font_name
                             run._element.rPr.rFonts.set(qn('w:eastAsia'), font_name)
-                        if font_size := cell_run.get('font_size', None):  
+                        if font_size := cell_run.get('font_size', None):
                             run.font.size = Pt(font_size)
 
         elif sdoc_type == 'callout':
@@ -315,7 +319,7 @@ def sdoc2docx(file_content_json, file_uuid, username):
                 if font_name := text_dict.get('font', None):
                     run.font.name = font_name
                     run._element.rPr.rFonts.set(qn('w:eastAsia'), font_name)
-                if font_size := text_dict.get('font_size', None):  
+                if font_size := text_dict.get('font_size', None):
                     run.font.size = Pt(font_size)
         else:
 
@@ -335,7 +339,7 @@ def sdoc2docx(file_content_json, file_uuid, username):
                 if font_name := text_dict.get('font', None):
                     run.font.name = font_name
                     run._element.rPr.rFonts.set(qn('w:eastAsia'), font_name)
-                if font_size := text_dict.get('font_size', None):  
+                if font_size := text_dict.get('font_size', None):
                     run.font.size = Pt(font_size)
 
     memory_stream = io.BytesIO()
