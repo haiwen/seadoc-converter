@@ -2,6 +2,7 @@ import uuid
 import requests
 import json
 import logging
+import time
 import xml.etree.ElementTree as ET
 
 from io import BytesIO, StringIO
@@ -89,6 +90,7 @@ def parse_block_contents(items, docx, docx_uuid):
                 upload_link = f"{SEAHUB_SERVICE_URL}/api/v2.1/seadoc/upload-image/{docx_uuid}/"
                 headers = gen_jwt_auth_header({
                     'file_uuid': docx_uuid,
+                    'exp': int(time.time()) + 300
                 })
                 resp = requests.post(upload_link, headers=headers,
                                         files={'file': (f'{get_image_name()}-{name_attr}.png', image_part._blob)})
