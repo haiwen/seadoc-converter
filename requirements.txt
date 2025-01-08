@@ -3,7 +3,7 @@ gevent
 html2text
 pyjwt==2.7.*
 python-docx==1.1.*
-pymysql==1.0.*
+pymysql
 requests
 beautifulsoup4==4.12.3
 markdown-it-py==3.0.0
