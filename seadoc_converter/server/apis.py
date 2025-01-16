@@ -220,3 +220,49 @@ def sdoc_export_to_docx():
         mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         headers={'Content-disposition': f'attachment; filename={new_filename}'}
     )
+
+
+@flask_app.route('/api/v1/sdoc-export-to-md/', methods=['POST'])
+def sdoc_export_to_md():
+    is_valid = check_auth_token(request)
+    if not is_valid:
+        return {'error_msg': 'Permission denied'}, 403
+
+    try:
+        data = json.loads(request.data)
+    except Exception as e:
+        logger.exception(e)
+        return {'error_msg': 'Bad request.'}, 400
+
+    path = data.get('path')
+    doc_uuid = data.get('doc_uuid')
+    src_type = data.get('src_type')
+    dst_type = data.get('dst_type')
+    download_url = data.get('download_url')
+
+    extension = Path(path).suffix
+    if extension not in ['.sdoc']:
+        return {'error_msg': 'path invalid.'}, 400
+
+    if not download_url:
+        return {'error_msg': 'download_url invalid.'}, 400
+
+    sdoc_content = requests.get(download_url).content.decode()
+
+    md_content = b''
+    if extension == '.sdoc' and src_type == 'sdoc' and dst_type == 'md':
+        if sdoc_content:
+            sdoc_content_json = json.loads(sdoc_content)
+            md_content = sdoc2md(sdoc_content_json, doc_uuid=doc_uuid)
+    else:
+        return {'error_msg': 'unsupported convert type.'}, 400
+
+    if isinstance(md_content, dict):
+        md_content = json.dumps(md_content)
+    filename = os.path.basename(path)
+    new_filename = quote(filename[:-4] + 'docx')
+    return Response(
+        md_content.encode(),
+        mimetype='application/octet-stream',
+        headers={'Content-disposition': f'attachment; filename={new_filename}'}
+    )
