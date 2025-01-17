@@ -202,7 +202,9 @@ def _handle_table_cell_dom(table_cell_json):
         else:
             child_type = child.get('type')
             if child_type == 'link':
-                output += _handle_link_dom(child)
+                text_name = child['children'][0]['text']
+                text_url = child.get('href')
+                output += f"[{text_name}]({text_url})"
 
     return output
 
@@ -249,22 +251,39 @@ def handle_blockquote(json_data):
 
 
 def handle_table(table_json):
-    th_headers = ''
-    th_body = ''
+    if not table_json['children']:
+        return '\n'
+        
+    rows = []
     first_table_row = table_json['children'][0]
     other_table_rows = table_json['children'][1:]
-
-    for first_table_cell in first_table_row['children']:
-        th_headers +=  "<th>%s</th>" % _handle_table_cell_dom(first_table_cell)
-
-    for table_row in other_table_rows:
-        td = ''
-        for table_cell in table_row['children']:
-            td += "<td>%s</td>" % _handle_table_cell_dom(table_cell)
-        th_body += "<tr>%s</tr>" % td
-
-    html = "<figure><table><thead><tr>%s</tr></thead><tbody>%s</tbody></table></figure>" % (th_headers, th_body)
-    return md_hander.handle(html)
+    
+    # get column count
+    col_count = len(first_table_row['children'])
+    
+    # handle header
+    header_cells = []
+    for cell in first_table_row['children']:
+        content = _handle_table_cell_dom(cell).strip()
+        content = content if content else ' '
+        header_cells.append(content)
+    rows.append('| ' + ' | '.join(header_cells) + ' |')
+    
+    # add separator line
+    separator_cells = ['---'] * col_count
+    rows.append('| ' + ' | '.join(separator_cells) + ' |')
+    
+    # handle table body
+    for row in other_table_rows:
+        row_cells = []
+        for cell in row['children']:
+            content = _handle_table_cell_dom(cell).strip()
+            content = content if content else ' '
+            row_cells.append(content)
+        rows.append('| ' + ' | '.join(row_cells) + ' |')
+    
+    # add empty line before and after table
+    return '\n' + '\n'.join(rows) + '\n'
 
 
 def handle_callout(json_data):
@@ -280,7 +299,6 @@ def handle_callout(json_data):
 def json2md(json_data, doc_uuid=''):
     doc_type = json_data.get('type')
     markdown_output = ''
-    print(doc_type,'---doc type')
     if doc_type in HEADER_LABEL:
         output = handle_header(json_data, doc_type)
         markdown_output += output
