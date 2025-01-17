@@ -64,33 +64,58 @@ def _handle_img_dom(img_json, doc_uuid=''):
 
 
 # 3 list including ordered / unordered list
-def _handle_list_dom(list_json, tag='', ordered=False):
-    for list_item in list_json['children']:
+def _handle_list_dom(list_json, indent_level=0, ordered=False):
+    '''
+    list_json: list json data
+    indent_level: indent level
+    ordered: whether the list is ordered
+    '''
+    result = []
+    
+    for index, list_item in enumerate(list_json['children'], 1):
         item_eles = list_item['children']
-        text = ''
+        current_line = '    ' * indent_level  # Use 4 Spaces as an indent
+        
+        # add mark according to list type
+        if ordered:
+            current_line += f"{index}. "
+        else:
+            current_line += "* "
+            
+        has_added_current_line = False
+            
+        # handle current line
         for lic in item_eles:
-
-            if lic.get('type') == 'unordered_list':
-                tag += _handle_list_dom(lic, '')
-            if lic.get('type') == 'ordered_list':
-                tag += _handle_list_dom(lic, '', True)
-
             if lic.get('type') == 'paragraph':
                 for item in lic['children']:
                     if 'text' in item:
-                        text += _handle_text_style(item)[0]
+                        current_line += _handle_text_style(item)[0]
                     else:
                         item_type = item.get('type')
                         if item_type == 'link':
                             text_name = item['children'][0]['text']
                             text_url = item.get('href')
-                            text += "<a href='%s'><span>%s</span></a>" % (text_url, text_name)
-                tag += "<li><p><span>%s</span></p></li>" % text
-    if ordered:
-        res = "<ul>%s</ul>" % tag
-    else:
-        res = "<ul>%s</ul>" % tag
-    return res
+                            current_line += f"[{text_name}]({text_url})"
+                
+                if not has_added_current_line:
+                    result.append(current_line)
+                    has_added_current_line = True
+                
+            # handle sub list
+            elif lic.get('type') in ['ordered_list', 'unordered_list']:
+                if not has_added_current_line and current_line.strip() != ('* ' if not ordered else f"{index}. "):
+                    result.append(current_line)
+                    has_added_current_line = True
+                    
+                # recursive handle sub list
+                sub_list = _handle_list_dom(
+                    lic, 
+                    indent_level + 1, 
+                    ordered=(lic.get('type') == 'ordered_list')
+                )
+                result.extend(sub_list)
+                
+    return result
 
 # 4 checkbox
 def _handle_check_list_dom(check_list_json):
@@ -203,9 +228,9 @@ def handle_paragraph(paragraph_json, doc_uuid=''):
 
 
 def handle_list(json_data, ordered=False):
-    html = _handle_list_dom(json_data, '', ordered)
-    md = md_hander.handle(html)
-    return md
+    # return processed markdown text directly
+    lines = _handle_list_dom(json_data, 0, ordered)
+    return '\n'.join(lines)
 
 
 def handle_codeblock(code_bloc_json):
@@ -255,6 +280,7 @@ def handle_callout(json_data):
 def json2md(json_data, doc_uuid=''):
     doc_type = json_data.get('type')
     markdown_output = ''
+    print(doc_type,'---doc type')
     if doc_type in HEADER_LABEL:
         output = handle_header(json_data, doc_type)
         markdown_output += output
