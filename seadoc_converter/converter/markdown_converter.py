@@ -198,7 +198,9 @@ def _handle_table_cell_dom(table_cell_json):
     output = ''
     for child in table_cell_json['children']:
         if 'text' in child:
-            output += _handle_text_style(child)[0]
+            text, _ = _handle_text_style(child)
+            # replace newline with space
+            output += text.replace('\n', ' ')
         else:
             child_type = child.get('type')
             if child_type == 'link':
@@ -206,7 +208,7 @@ def _handle_table_cell_dom(table_cell_json):
                 text_url = child.get('href')
                 output += f"[{text_name}]({text_url})"
 
-    return output
+    return output.strip()
 
 
 #  html2markdown
@@ -255,34 +257,47 @@ def handle_table(table_json):
         return '\n'
         
     rows = []
-    first_table_row = table_json['children'][0]
-    other_table_rows = table_json['children'][1:]
+    table_rows = table_json['children']
     
-    # get column count
-    col_count = len(first_table_row['children'])
+    # get all rows and actual column count
+    max_cols = 0
+    all_rows = []
+    
+    # first scan: determine actual column count and save all rows
+    for row in table_rows:
+        row_contents = []
+        for cell in row['children']:
+            content = _handle_table_cell_dom(cell).strip()
+            if content.endswith('+'):
+                content = content + ' '  # add space after "+"
+            row_contents.append(content)
+        # update max column count, no longer filter empty rows
+        max_cols = max(max_cols, len(row_contents))
+        all_rows.append(row_contents)
+    
+    # if column count is 0, return empty line
+    if max_cols == 0:
+        return '\n'
     
     # handle header
+    header_row = all_rows[0]
     header_cells = []
-    for cell in first_table_row['children']:
-        content = _handle_table_cell_dom(cell).strip()
-        content = content if content else ' '
-        header_cells.append(content)
+    for i in range(max_cols):
+        content = header_row[i] if i < len(header_row) else ' '
+        header_cells.append(content or ' ')
     rows.append('| ' + ' | '.join(header_cells) + ' |')
     
     # add separator line
-    separator_cells = ['---'] * col_count
-    rows.append('| ' + ' | '.join(separator_cells) + ' |')
+    rows.append('| ' + ' | '.join(['---'] * max_cols) + ' |')
     
-    # handle table body
-    for row in other_table_rows:
-        row_cells = []
-        for cell in row['children']:
-            content = _handle_table_cell_dom(cell).strip()
-            content = content if content else ' '
-            row_cells.append(content)
-        rows.append('| ' + ' | '.join(row_cells) + ' |')
+    # handle all data rows, including empty rows
+    for row_cells in all_rows[1:]:
+        formatted_cells = []
+        for i in range(max_cols):
+            content = row_cells[i] if i < len(row_cells) else ' '
+            formatted_cells.append(content or ' ')
+        rows.append('| ' + ' | '.join(formatted_cells) + ' |')
     
-    # add empty line before and after table
     return '\n' + '\n'.join(rows) + '\n'
 
 
