@@ -17,7 +17,18 @@ LOG_FILE = None
 LOG_LEVEL = 'info'
 ENABLE_SYS_LOG = False
 
-PANDOC_MEDIA_ROOT = '/tmp/pandoc'
+
+SDOC_DIR = os.environ.get('SDOC_DIR', '')
+if not SDOC_DIR:
+    logging.critical('SDOC_DIR is not set')
+    raise RuntimeError('SDOC_DIR is not set')
+if not os.path.exists(SDOC_DIR):
+    logging.critical('SDOC_DIR %s does not exist' % SDOC_DIR)
+    raise RuntimeError('SDOC_DIR does not exist.')
+sys.path.insert(0, SDOC_DIR)
+
+SDOC_OPERATION_CLEAN_LOG_FILE = 'sdoc_operation_log_clean.log'
+SDOC_OPERATION_CLEAN_LOG_LEVEL = 'info'
 
 
 # config in file
