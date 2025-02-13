@@ -11,22 +11,20 @@ SERVER_HOST = '127.0.0.1'
 SERVER_PORT = '8888'
 
 SEADOC_PRIVATE_KEY = ''
-SEAHUB_SERVICE_URL = ''
+SEAHUB_SERVICE_URL = 'http://127.0.0.1:8000'
 
 LOG_DIR = os.environ.get('LOG_DIR', '')
 LOG_FILE = os.path.join(LOG_DIR, 'seadoc-converter.log')
 LOG_LEVEL = 'info'
-ENABLE_SYS_LOG = False
 
-
-SDOC_DIR = os.environ.get('SDOC_DIR', '')
-if not SDOC_DIR:
-    logging.critical('SDOC_DIR is not set')
-    raise RuntimeError('SDOC_DIR is not set')
-if not os.path.exists(SDOC_DIR):
-    logging.critical('SDOC_DIR %s does not exist' % SDOC_DIR)
-    raise RuntimeError('SDOC_DIR does not exist.')
-sys.path.insert(0, SDOC_DIR)
+SDOC_SERVER_DIR = os.environ.get('SDOC_SERVER_DIR', '')
+if not SDOC_SERVER_DIR:
+    logging.critical('SDOC_SERVER_DIR is not set')
+    raise RuntimeError('SDOC_SERVER_DIR is not set')
+if not os.path.exists(SDOC_SERVER_DIR):
+    logging.critical('SDOC_SERVER_DIR %s does not exist' % SDOC_SERVER_DIR)
+    raise RuntimeError('SDOC_SERVER_DIR does not exist.')
+sys.path.insert(0, SDOC_SERVER_DIR)
 
 SDOC_OPERATION_CLEAN_LOG_FILE = os.path.join(LOG_DIR, 'sdoc_operation_log_clean.log')
 SDOC_OPERATION_CLEAN_LOG_LEVEL = 'info'
