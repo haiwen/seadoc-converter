@@ -43,10 +43,3 @@ class LogConfigurator(object):
         }
 
         logging.basicConfig(**kw)
-
-    def add_syslog_handler(self):
-        handler = handlers.SysLogHandler(address='/dev/log')
-        handler.setLevel(self._level)
-        formatter = logging.Formatter('seafconverter[%(process)d]: %(message)s')
-        handler.setFormatter(formatter)
-        logging.root.addHandler(handler)

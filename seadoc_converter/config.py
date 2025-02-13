@@ -16,8 +16,6 @@ SEAHUB_SERVICE_URL = 'http://127.0.0.1:8000'
 LOG_DIR = os.environ.get('LOG_DIR', '')
 LOG_FILE = os.path.join(LOG_DIR, 'seadoc-converter.log')
 LOG_LEVEL = 'info'
-ENABLE_SYS_LOG = False
-
 
 SDOC_SERVER_DIR = os.environ.get('SDOC_SERVER_DIR', '')
 if not SDOC_SERVER_DIR:

@@ -5,10 +5,7 @@ from seadoc_converter.app.log import LogConfigurator
 from seadoc_converter.app.seadoc_converter_app import SeadocConverterApp
 
 def main():
-    app_logger = LogConfigurator(config.LOG_LEVEL, config.LOG_FILE)
-
-    if config.ENABLE_SYS_LOG:
-        app_logger.add_syslog_handler()
+    LogConfigurator(config.LOG_LEVEL, config.LOG_FILE)
 
     app = SeadocConverterApp(config)
     app.serve_forever()
