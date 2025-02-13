@@ -1,7 +1,7 @@
 import os
 import logging
 from threading import Thread, Event
-from seadoc_converter.config import SDOC_DIR, SDOC_OPERATION_CLEAN_LOG_FILE, SDOC_OPERATION_CLEAN_LOG_LEVEL
+from seadoc_converter.config import SDOC_SERVER_DIR, SDOC_OPERATION_CLEAN_LOG_FILE, SDOC_OPERATION_CLEAN_LOG_LEVEL
 from seadoc_converter.utils import get_python_executable, run
 
 
@@ -40,7 +40,7 @@ class SdocOperationLogCleanerTimer(Thread):
                 logging.info('start cleaning sdoc operation log.')
                 try:
                     python_exec = get_python_executable()
-                    operation_clean_py = os.path.join(SDOC_DIR, 'scripts', 'clean_operation_log.py')
+                    operation_clean_py = os.path.join(SDOC_SERVER_DIR, 'scripts', 'clean_operation_log.py')
                     cmd = [
                         python_exec,
                         operation_clean_py,
@@ -48,7 +48,7 @@ class SdocOperationLogCleanerTimer(Thread):
                         '--loglevel', self._loglevel,
                     ]
                     with open(self._logfile, 'a') as fp:
-                        run(cmd, cwd=SDOC_DIR, output=fp)
+                        run(cmd, cwd=SDOC_SERVER_DIR, output=fp)
                 except Exception as e:
                     logging.exception('error when clean sdoc operation log: %s', e)
 
