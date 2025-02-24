@@ -64,33 +64,58 @@ def _handle_img_dom(img_json, doc_uuid=''):
 
 
 # 3 list including ordered / unordered list
-def _handle_list_dom(list_json, tag='', ordered=False):
-    for list_item in list_json['children']:
+def _handle_list_dom(list_json, indent_level=0, ordered=False):
+    '''
+    list_json: list json data
+    indent_level: indent level
+    ordered: whether the list is ordered
+    '''
+    result = []
+    
+    for index, list_item in enumerate(list_json['children'], 1):
         item_eles = list_item['children']
-        text = ''
+        current_line = '    ' * indent_level  # Use 4 Spaces as an indent
+        
+        # add mark according to list type
+        if ordered:
+            current_line += f"{index}. "
+        else:
+            current_line += "* "
+            
+        has_added_current_line = False
+            
+        # handle current line
         for lic in item_eles:
-
-            if lic.get('type') == 'unordered_list':
-                tag += _handle_list_dom(lic, '')
-            if lic.get('type') == 'ordered_list':
-                tag += _handle_list_dom(lic, '', True)
-
             if lic.get('type') == 'paragraph':
                 for item in lic['children']:
                     if 'text' in item:
-                        text += _handle_text_style(item)[0]
+                        current_line += _handle_text_style(item)[0]
                     else:
                         item_type = item.get('type')
                         if item_type == 'link':
                             text_name = item['children'][0]['text']
                             text_url = item.get('href')
-                            text += "<a href='%s'><span>%s</span></a>" % (text_url, text_name)
-                tag += "<li><p><span>%s</span></p></li>" % text
-    if ordered:
-        res = "<ul>%s</ul>" % tag
-    else:
-        res = "<ul>%s</ul>" % tag
-    return res
+                            current_line += f"[{text_name}]({text_url})"
+                
+                if not has_added_current_line:
+                    result.append(current_line)
+                    has_added_current_line = True
+                
+            # handle sub list
+            elif lic.get('type') in ['ordered_list', 'unordered_list']:
+                if not has_added_current_line and current_line.strip() != ('* ' if not ordered else f"{index}. "):
+                    result.append(current_line)
+                    has_added_current_line = True
+                    
+                # recursive handle sub list
+                sub_list = _handle_list_dom(
+                    lic, 
+                    indent_level + 1, 
+                    ordered=(lic.get('type') == 'ordered_list')
+                )
+                result.extend(sub_list)
+                
+    return result
 
 # 4 checkbox
 def _handle_check_list_dom(check_list_json):
@@ -173,13 +198,17 @@ def _handle_table_cell_dom(table_cell_json):
     output = ''
     for child in table_cell_json['children']:
         if 'text' in child:
-            output += _handle_text_style(child)[0]
+            text, _ = _handle_text_style(child)
+            # replace newline with space
+            output += text.replace('\n', ' ')
         else:
             child_type = child.get('type')
             if child_type == 'link':
-                output += _handle_link_dom(child)
+                text_name = child['children'][0]['text']
+                text_url = child.get('href')
+                output += f"[{text_name}]({text_url})"
 
-    return output
+    return output.strip()
 
 
 #  html2markdown
@@ -203,9 +232,9 @@ def handle_paragraph(paragraph_json, doc_uuid=''):
 
 
 def handle_list(json_data, ordered=False):
-    html = _handle_list_dom(json_data, '', ordered)
-    md = md_hander.handle(html)
-    return md
+    # return processed markdown text directly
+    lines = _handle_list_dom(json_data, 0, ordered)
+    return '\n'.join(lines)
 
 
 def handle_codeblock(code_bloc_json):
@@ -224,22 +253,52 @@ def handle_blockquote(json_data):
 
 
 def handle_table(table_json):
-    th_headers = ''
-    th_body = ''
-    first_table_row = table_json['children'][0]
-    other_table_rows = table_json['children'][1:]
-
-    for first_table_cell in first_table_row['children']:
-        th_headers +=  "<th>%s</th>" % _handle_table_cell_dom(first_table_cell)
-
-    for table_row in other_table_rows:
-        td = ''
-        for table_cell in table_row['children']:
-            td += "<td>%s</td>" % _handle_table_cell_dom(table_cell)
-        th_body += "<tr>%s</tr>" % td
-
-    html = "<figure><table><thead><tr>%s</tr></thead><tbody>%s</tbody></table></figure>" % (th_headers, th_body)
-    return md_hander.handle(html)
+    if not table_json['children']:
+        return '\n'
+        
+    rows = []
+    table_rows = table_json['children']
+    
+    # get all rows and actual column count
+    max_cols = 0
+    all_rows = []
+    
+    # first scan: determine actual column count and save all rows
+    for row in table_rows:
+        row_contents = []
+        for cell in row['children']:
+            content = _handle_table_cell_dom(cell).strip()
+            if content.endswith('+'):
+                content = content + ' '  # add space after "+"
+            row_contents.append(content)
+        # update max column count, no longer filter empty rows
+        max_cols = max(max_cols, len(row_contents))
+        all_rows.append(row_contents)
+    
+    # if column count is 0, return empty line
+    if max_cols == 0:
+        return '\n'
+    
+    # handle header
+    header_row = all_rows[0]
+    header_cells = []
+    for i in range(max_cols):
+        content = header_row[i] if i < len(header_row) else ' '
+        header_cells.append(content or ' ')
+    rows.append('| ' + ' | '.join(header_cells) + ' |')
+    
+    # add separator line
+    rows.append('| ' + ' | '.join(['---'] * max_cols) + ' |')
+    
+    # handle all data rows, including empty rows
+    for row_cells in all_rows[1:]:
+        formatted_cells = []
+        for i in range(max_cols):
+            content = row_cells[i] if i < len(row_cells) else ' '
+            formatted_cells.append(content or ' ')
+        rows.append('| ' + ' | '.join(formatted_cells) + ' |')
+    
+    return '\n' + '\n'.join(rows) + '\n'
 
 
 def handle_callout(json_data):
