@@ -71,7 +71,6 @@ def convert_markdown_to_sdoc():
         file_content = requests.get(download_url).content
     else:
         file_content = requests.get(download_url).content.decode()
-
     parent_dir = os.path.dirname(path)
     file_name = os.path.basename(path)
 
@@ -259,10 +258,7 @@ def sdoc_export_to_md():
 
     if isinstance(md_content, dict):
         md_content = json.dumps(md_content)
-    filename = os.path.basename(path)
-    new_filename = quote(filename[:-4] + 'docx')
     return Response(
         md_content.encode(),
         mimetype='application/octet-stream',
-        headers={'Content-disposition': f'attachment; filename={new_filename}'}
     )
