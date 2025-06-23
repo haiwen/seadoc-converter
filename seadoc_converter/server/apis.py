@@ -301,11 +301,12 @@ def confluence_to_wiki():
     try:
         response = requests.get(download_url)
         extract_dir = '/tmp/wiki'
+        if not os.path.exists(extract_dir):
+            os.mkdir(extract_dir)
+
         with open(f'{extract_dir}/{filename}', 'wb') as f:
             f.write(response.content)
         
-        if not os.path.exists(extract_dir):
-            os.mkdir(extract_dir)
         with ZipFile(f'{extract_dir}/{filename}', 'r') as zip_ref:
             all_entries = zip_ref.infolist()
             zip_ref.extractall(extract_dir)
