@@ -75,7 +75,7 @@ def process_images_and_attachments(content_div, html_file, seafile_server_url):
                 a.attrs['href'] = f""
             # connect attachment:  currently only jump to the file
             else:
-                a.attrs['href'] = f"{seafile_server_url}/{href}"
+                a.attrs['href'] = f"{seafile_server_url}/{href}?dl=1"
         
     # process images
     for img in content_div.find_all('img'):
@@ -178,7 +178,6 @@ def process_zip_file(space_dir, seafile_server_url, username, upload_url):
                 cf_id_to_cf_title_map.update(result)
         except Exception as e:
             raise e
-    
     # md to sdoc
     md_files = list(Path(md_output_dir).glob('*.md'))
     sdoc_files = []

@@ -296,39 +296,48 @@ def confluence_to_wiki():
     underscore_index = filename.rfind('_')
     if underscore_index != -1:
         space_key = filename[underscore_index + 1:-len('.html.zip')]
-    else:
+    elif 'Confluence-space-export-' in filename:
+        wiki_name = filename[:-len('.html.zip')]
         space_key = filename[len('Confluence-space-export-'):-len('.html.zip')]
+    else:
+        wiki_name = filename[:-len('.html.zip')]
+        space_key = wiki_name
     try:
         response = requests.get(download_url)
         extract_dir = '/tmp/wiki'
+        space_dir = os.path.join(extract_dir, space_key)
+        zip_file_path = os.path.join(extract_dir, filename)
         if not os.path.exists(extract_dir):
             os.mkdir(extract_dir)
-
-        with open(f'{extract_dir}/{filename}', 'wb') as f:
-            f.write(response.content)
-        
-        with ZipFile(f'{extract_dir}/{filename}', 'r') as zip_ref:
-            all_entries = zip_ref.infolist()
-            zip_ref.extractall(extract_dir)
-            if all_entries:
-                first_entry = all_entries[1].filename
-                top_dir = first_entry.split('/')[0] if '/' in first_entry else None
-                if top_dir and top_dir != space_key:
-                    old_path = f'{extract_dir}/{top_dir}'
-                    new_path = f'{extract_dir}/{space_key}'
-                    if os.path.exists(new_path):
-                        shutil.rmtree(new_path)
-                    if os.path.exists(old_path):
-                        os.rename(old_path, new_path)
+        # Deploy on two machines
+        is_same_machine = True
+        if not os.path.exists(zip_file_path):
+            with open(zip_file_path, 'wb') as f:
+                f.write(response.content)
+        if not os.path.exists(space_dir):
+            is_same_machine = False
+            with ZipFile(zip_file_path, 'r') as zip_ref:
+                all_entries = zip_ref.infolist()
+                zip_ref.extractall(extract_dir)
+                if all_entries:
+                    first_entry = all_entries[1].filename
+                    top_dir = first_entry.split('/')[0] if '/' in first_entry else None
+                    if top_dir and top_dir != space_key:
+                        old_path = f'{extract_dir}/{top_dir}'
+                        new_path = f'{extract_dir}/{space_key}'
+                        if os.path.exists(new_path):
+                            shutil.rmtree(new_path)
+                        if os.path.exists(old_path):
+                            os.rename(old_path, new_path)
     except Exception as e:
         logger.exception(e)
         return {'error_msg': 'Failed to download or extract confluence content.'}, 500
-    space_dir = f'{extract_dir}/{space_key}'
     try:
         cf_id_to_cf_title_map = process_zip_file(space_dir, seafile_server_url, username, upload_url)
     except Exception as e:
         logger.exception(e)
         return {'error_msg': 'Failed to process confluence content.'}, 500
     finally:
-        shutil.rmtree(extract_dir)
+        if not is_same_machine:
+            shutil.rmtree(extract_dir)
     return {'cf_id_to_cf_title_map': cf_id_to_cf_title_map}, 200
