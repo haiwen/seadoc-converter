@@ -3,8 +3,11 @@ import jwt
 import json
 import logging
 import requests
+import shutil
+from io import BytesIO
 from pathlib import Path
 from urllib.parse import quote
+from zipfile import ZipFile
 
 from flask import request, Flask, Response
 from seadoc_converter import config
@@ -13,6 +16,7 @@ from seadoc_converter.converter.sdoc_converter.docx2sdoc import docx2sdoc
 from seadoc_converter.converter.sdoc_converter.md2sdoc import md2sdoc
 from seadoc_converter.converter.markdown_converter import sdoc2md
 from seadoc_converter.converter.docx_converter import sdoc2docx
+from seadoc_converter.converter.utils import process_zip_file
 
 logger = logging.getLogger(__name__)
 flask_app = Flask(__name__)
@@ -262,3 +266,78 @@ def sdoc_export_to_md():
         md_content.encode(),
         mimetype='application/octet-stream',
     )
+
+
+@flask_app.route('/api/v1/confluence-to-wiki/', methods=['POST'])
+def confluence_to_wiki():
+    is_valid = check_auth_token(request)
+    if not is_valid:
+        return {'error_msg': 'Permission denied'}, 403
+    try:
+        data = json.loads(request.data)
+    except Exception as e:
+        logger.exception(e)
+        return {'error_msg': 'Bad request.'}, 400
+    
+    filename = data.get('filename')
+    download_url = data.get('download_url')
+    upload_url = data.get('upload_url')
+    username = data.get('username')
+    seafile_server_url = data.get('seafile_server_url', '')
+
+    if not filename:
+        return {'error_msg': 'path invalid.'}, 400
+    if not download_url:
+        return {'error_msg': 'download_url invalid.'}, 400
+    if not username:
+        return {'error_msg': 'username invalid.'}, 400
+    if not upload_url:
+        return {'error_msg': 'upload_url invalid.'}, 400
+    
+    underscore_index = filename.rfind('_')
+    if underscore_index != -1:
+        space_key = filename[underscore_index + 1:-len('.html.zip')]
+    elif 'Confluence-space-export-' in filename:
+        wiki_name = filename[:-len('.html.zip')]
+        space_key = filename[len('Confluence-space-export-'):-len('.html.zip')]
+    else:
+        wiki_name = filename[:-len('.html.zip')]
+        space_key = wiki_name
+    try:
+        extract_dir = '/tmp/wiki'
+        space_dir = os.path.join(extract_dir, space_key)
+        zip_file_path = os.path.join(extract_dir, filename)
+        if not os.path.exists(extract_dir):
+            os.mkdir(extract_dir)
+        # Deploy on two machines
+        is_same_machine = True
+        if not os.path.exists(space_dir):
+            is_same_machine = False
+            response = requests.get(download_url)
+            with ZipFile(BytesIO(response.content), 'r') as zip_ref:
+                all_entries = zip_ref.infolist()
+                zip_ref.extractall(extract_dir)
+                if all_entries:
+                    first_entry = all_entries[1].filename
+                    top_dir = first_entry.split('/')[0] if '/' in first_entry else None
+                    if top_dir and top_dir != space_key:
+                        old_path = f'{extract_dir}/{top_dir}'
+                        new_path = f'{extract_dir}/{space_key}'
+                        if os.path.exists(new_path):
+                            shutil.rmtree(new_path)
+                        if os.path.exists(old_path):
+                            os.rename(old_path, new_path)
+    except Exception as e:
+        logger.exception(e)
+        return {'error_msg': 'Failed to download or extract confluence content.'}, 500
+    try:
+        cf_id_to_cf_title_map = process_zip_file(space_dir, seafile_server_url, username, upload_url)
+    except Exception as e:
+        logger.exception(e)
+        return {'error_msg': 'Failed to process confluence content.'}, 500
+    finally:
+        if not is_same_machine:
+            shutil.rmtree(extract_dir)
+        if os.path.exists(zip_file_path):
+            os.remove(zip_file_path)
+    return {'cf_id_to_cf_title_map': cf_id_to_cf_title_map}, 200
