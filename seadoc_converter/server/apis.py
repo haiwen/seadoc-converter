@@ -340,4 +340,6 @@ def confluence_to_wiki():
     finally:
         if not is_same_machine:
             shutil.rmtree(extract_dir)
+        if os.path.exists(zip_file_path):
+            os.remove(zip_file_path)
     return {'cf_id_to_cf_title_map': cf_id_to_cf_title_map}, 200
