@@ -4,6 +4,7 @@ import json
 import logging
 import requests
 import shutil
+from io import BytesIO
 from pathlib import Path
 from urllib.parse import quote
 from zipfile import ZipFile
@@ -303,7 +304,6 @@ def confluence_to_wiki():
         wiki_name = filename[:-len('.html.zip')]
         space_key = wiki_name
     try:
-        response = requests.get(download_url)
         extract_dir = '/tmp/wiki'
         space_dir = os.path.join(extract_dir, space_key)
         zip_file_path = os.path.join(extract_dir, filename)
@@ -311,12 +311,10 @@ def confluence_to_wiki():
             os.mkdir(extract_dir)
         # Deploy on two machines
         is_same_machine = True
-        if not os.path.exists(zip_file_path):
-            with open(zip_file_path, 'wb') as f:
-                f.write(response.content)
         if not os.path.exists(space_dir):
             is_same_machine = False
-            with ZipFile(zip_file_path, 'r') as zip_ref:
+            response = requests.get(download_url)
+            with ZipFile(BytesIO(response.content), 'r') as zip_ref:
                 all_entries = zip_ref.infolist()
                 zip_ref.extractall(extract_dir)
                 if all_entries:
