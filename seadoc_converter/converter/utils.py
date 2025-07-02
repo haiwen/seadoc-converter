@@ -80,8 +80,9 @@ def process_images_and_attachments(content_div, html_file, seafile_server_url):
     # process images
     for img in content_div.find_all('img'):
         src = img.get('src', '')
-        # data:image/png;base64, remain unchanged
+        # data:image/png;base64, remove data:base64 img
         if not src or src.startswith(('data:')):
+            img.decompose()
             continue
         if src.startswith('images/'):
             pass
