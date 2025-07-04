@@ -310,6 +310,36 @@ def handle_callout(json_data):
         callout += output
     return callout
 
+def handle_image_block(json_data, doc_uuid=''):
+    children = json_data.get('children', [])
+    
+    if not children:
+        return ''
+    
+    for child in children:
+        child_type = child.get('type')
+        
+        if child_type == 'image':
+            data = child.get('data', {})
+            src = data.get('src', '')
+            
+            if doc_uuid and src:
+                src = trans_img_path_to_url(src, doc_uuid)
+            
+            alt_text = ''
+            if 'children' in child and child['children']:
+                alt_text = child['children'][0].get('text', '')
+            
+            return f"![{alt_text}]({src})\n"
+        
+        elif 'text' in child:
+            text = child.get('text', '').strip()
+            if text:
+                return f"{text}\n"
+    
+    return ''
+
+
 
 def json2md(json_data, doc_uuid=''):
     doc_type = json_data.get('type')
@@ -348,6 +378,10 @@ def json2md(json_data, doc_uuid=''):
 
     if doc_type == 'callout':
         output = handle_callout(json_data)
+        markdown_output += output
+    
+    if doc_type == 'image_block':
+        output = handle_image_block(json_data, doc_uuid)
         markdown_output += output
 
     return markdown_output
