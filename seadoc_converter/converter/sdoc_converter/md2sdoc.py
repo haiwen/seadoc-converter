@@ -43,6 +43,12 @@ def parse_tokens(token_stream, **kwargs):
                 'children': [{'id': get_random_id(), 'text': ''}],
                 'data': {'src': token.attrs.get('src')}
             }
+            width = token.attrs.get('width')
+            height = token.attrs.get('height')
+            if width:
+                img_struct['data']['width'] = float(width)
+            if height:
+                img_struct['data']['height'] = float(height)
             sdoc_children.extend([empty_elem, img_struct, empty_elem])
         elif token.type in {'html_block', 'html_inline'}:
             sdoc_children.extend(parse_html_inline_block(token.content))
