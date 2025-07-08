@@ -312,21 +312,12 @@ def confluence_to_wiki():
         # Deploy on two machines
         is_same_machine = True
         if not os.path.exists(space_dir):
+            os.mkdir(space_dir)
             is_same_machine = False
             response = requests.get(download_url)
             with ZipFile(BytesIO(response.content), 'r') as zip_ref:
-                all_entries = zip_ref.infolist()
-                zip_ref.extractall(extract_dir)
-                if all_entries:
-                    first_entry = all_entries[1].filename
-                    top_dir = first_entry.split('/')[0] if '/' in first_entry else None
-                    if top_dir and top_dir != space_key:
-                        old_path = f'{extract_dir}/{top_dir}'
-                        new_path = f'{extract_dir}/{space_key}'
-                        if os.path.exists(new_path):
-                            shutil.rmtree(new_path)
-                        if os.path.exists(old_path):
-                            os.rename(old_path, new_path)
+                zip_ref.extractall(space_dir)
+                
     except Exception as e:
         logger.exception(e)
         return {'error_msg': 'Failed to download or extract confluence content.'}, 500
