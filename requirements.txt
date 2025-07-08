@@ -5,7 +5,7 @@ pyjwt==2.7.*
 python-docx==1.1.*
 pymysql
 requests
-beautifulsoup4==4.12.3
+beautifulsoup4==4.13.4
 markdown-it-py==3.0.0
 mdit_py_plugins==0.4.2
 linkify-it-py==2.0.3
