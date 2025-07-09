@@ -99,10 +99,8 @@ def process_images_and_attachments(content_div, html_file, seafile_server_url):
                 # calculate the full path of the image
                 if '?' in src:
                     src = src.split('?')[0]
-                img_path = (html_file.parent / src).resolve()
-                if img_path.exists():
-                    # build new URL
-                    img['src'] = f"/{img_name}"
+                # build new URL
+                img['src'] = f"/{img_name}"
             except Exception as e:
                 pass
         
@@ -221,3 +219,4 @@ def zip_and_upload_files(file_paths, output_zip_path, upload_url):
     resp = requests.post(upload_url, files=files)
     if not resp.ok:
         raise Exception(f"upload zip file failed: {resp.text}")
+
