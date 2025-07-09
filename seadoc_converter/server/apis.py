@@ -256,7 +256,7 @@ def sdoc_export_to_md():
     if extension == '.sdoc' and src_type == 'sdoc' and dst_type == 'md':
         if sdoc_content:
             sdoc_content_json = json.loads(sdoc_content)
-            md_content = sdoc2md(sdoc_content_json)
+            md_content = sdoc2md(sdoc_content_json, doc_uuid)
     else:
         return {'error_msg': 'unsupported convert type.'}, 400
 

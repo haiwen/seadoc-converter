@@ -386,7 +386,11 @@ def docx2sdoc(docx, username, docx_uuid):
         elif style_name.startswith('List'):
             node = parse_list(block, numbering_xml, docx, docx_uuid)
         elif is_normal_table:
-            node = parse_table(block, docx, docx_uuid)
+            is_paragraph = isinstance(block, Paragraph)
+            if is_paragraph:
+                node = parse_paragraph(block, docx, docx_uuid)
+            else:
+                node = parse_table(block, docx, docx_uuid)
         elif style_name == 'Quote':
             node = parse_quote(block, docx, docx_uuid)
         if node and node.get('children'):
