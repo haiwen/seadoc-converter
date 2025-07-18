@@ -138,7 +138,6 @@ def parse_html_inline_block(html):
     try:
         element = ET.fromstring(html)
     except Exception as e:
-        print(e)
         return [empty_elem]
 
     imgsrc = element.get('src')
