@@ -210,8 +210,7 @@ def parse_list(block, numbering_xml, docx, docx_uuid):
         num_id = block.style._element.pPr.numPr.numId.val
     else:
         return parse_paragraph(block, docx, docx_uuid)
-
-    if block._element.pPr.numPr is not None:
+    if block._element.pPr.numPr is not None and block._element.pPr.numPr.ilvl is not None:
         ilvl_id = block._element.pPr.numPr.ilvl.val
     elif block.style._element.pPr.numPr is not None:
         ilvl_id = block.style._element.pPr.numPr.ilvl.val
@@ -377,6 +376,8 @@ def docx2sdoc(docx, username, docx_uuid):
     for block in iter_block_items(docx):
         style = block.style
         style_name = block.style.name
+        base_style = style.base_style
+        is_normal_table = style_name == 'Normal Table' or (base_style.name if base_style else False)
         node = {}
         if style_name in styles_map:
             node = parse_heading(block, styles_map[style_name], docx, docx_uuid)
@@ -384,8 +385,12 @@ def docx2sdoc(docx, username, docx_uuid):
             node = parse_paragraph(block, docx, docx_uuid)
         elif style_name.startswith('List'):
             node = parse_list(block, numbering_xml, docx, docx_uuid)
-        elif style_name == 'Normal Table' or style.base_style.name == 'Normal Table':
-            node = parse_table(block, docx, docx_uuid)
+        elif is_normal_table:
+            is_paragraph = isinstance(block, Paragraph)
+            if is_paragraph:
+                node = parse_paragraph(block, docx, docx_uuid)
+            else:
+                node = parse_table(block, docx, docx_uuid)
         elif style_name == 'Quote':
             node = parse_quote(block, docx, docx_uuid)
         if node and node.get('children'):

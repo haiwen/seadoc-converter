@@ -26,7 +26,10 @@ def parse_tokens(token_stream, **kwargs):
         elif token.type == 'em':
             sdoc_children.extend(parse_tokens(token.children, italic=True, **kwargs))
         elif token.type == 'strong':
-            sdoc_children.extend(parse_tokens(token.children, bold=True, **kwargs))
+            if 'bold' not in kwargs:
+                sdoc_children.extend(parse_tokens(token.children, bold=True, **kwargs))
+            else:
+                sdoc_children.extend(parse_tokens(token.children, **kwargs))
         elif token.type == 'link':
             link_struct = {
                 'id': get_random_id(),
@@ -132,7 +135,10 @@ def parse_check_list(node):
 
 def parse_html_inline_block(html):
     empty_elem = {'id': get_random_id(), 'text': ''}
-    element = ET.fromstring(html)
+    try:
+        element = ET.fromstring(html)
+    except Exception as e:
+        return [empty_elem]
 
     imgsrc = element.get('src')
     width = element.get('width')
