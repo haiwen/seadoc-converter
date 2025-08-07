@@ -2,7 +2,7 @@ Flask==3.1.*
 gevent==25.5.*
 html2text
 pyjwt==2.10.*
-python-docx==1.1.*
+python-docx==1.2.*
 pymysql
 requests==2.32.*
 beautifulsoup4==4.13.4
