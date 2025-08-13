@@ -1,10 +1,10 @@
-Flask
-gevent
+Flask==3.1.*
+gevent==25.5.*
 html2text
-pyjwt==2.7.*
-python-docx==1.1.*
+pyjwt==2.10.*
+python-docx==1.2.*
 pymysql
-requests
+requests==2.32.*
 beautifulsoup4==4.13.4
 markdown-it-py==3.0.0
 mdit_py_plugins==0.4.2
