@@ -212,7 +212,7 @@ def parse_list(block, numbering_xml, docx, docx_uuid):
         return parse_paragraph(block, docx, docx_uuid)
     if block._element.pPr.numPr is not None and block._element.pPr.numPr.ilvl is not None:
         ilvl_id = block._element.pPr.numPr.ilvl.val
-    elif block.style._element.pPr.numPr is not None:
+    elif block.style._element.pPr.numPr is not None and block.style._element.pPr.numPr.ilvl is not None:
         ilvl_id = block.style._element.pPr.numPr.ilvl.val
     else:
         return parse_paragraph(block, docx, docx_uuid)
