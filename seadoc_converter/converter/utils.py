@@ -2,6 +2,7 @@ import os
 import re
 import jwt
 import json
+import logging
 import requests
 
 from zipfile import ZipFile
@@ -186,7 +187,8 @@ def process_zip_file(space_dir, seafile_server_url, username, upload_url):
             if sdoc_file:
                 sdoc_files.append(sdoc_file)
         except Exception as e:
-            raise e
+            logging.error(f"convert failed: {md_file} failed: {e}")
+            continue
     
     # zip and upload sdoc files
     if sdoc_files:
