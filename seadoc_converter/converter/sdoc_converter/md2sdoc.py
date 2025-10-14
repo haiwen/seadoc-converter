@@ -156,7 +156,12 @@ def parse_html_inline_block(html):
 
 def parse_table(node):
     children_list = []
-    thead, tbody = node.children
+    if len(node.children) != 2:
+        thead = node.children[0]
+        table_rows = thead.children
+    else:
+        thead, tbody = node.children
+        table_rows = thead.children + tbody.children
 
     column_count = len(thead.children[0].children)
     column_width = int(672 / column_count)
@@ -167,8 +172,6 @@ def parse_table(node):
         'children': children_list,
         'columns': [{'width': column_width}] * column_count
     }
-
-    table_rows = thead.children + tbody.children
 
     for row in table_rows:
         row_children = row.children
