@@ -37,15 +37,11 @@ def parse_tokens(token_stream, **kwargs):
     sdoc_children = []
     for token in token_stream:
         if token.type == 'text':
-            elements = copy.deepcopy(kwargs)
-            elements.pop('image_name_url_map', '') 
             text = token.content
-            sdoc_children.append({'id': get_random_id(), 'text': text, **elements})
+            sdoc_children.append({'id': get_random_id(), 'text': text, **kwargs})
         elif token.type == 'code_inline':
-            elements = copy.deepcopy(kwargs)
-            elements.pop('image_name_url_map', '') 
             text = token.content
-            sdoc_children.append({'id': get_random_id(), 'text': text, 'code': True, **elements})
+            sdoc_children.append({'id': get_random_id(), 'text': text, 'code': True, **kwargs})
         elif token.type == 'em':
             sdoc_children.extend(parse_tokens(token.children, italic=True, **kwargs))
         elif token.type == 'strong':
@@ -84,9 +80,7 @@ def parse_tokens(token_stream, **kwargs):
             # image_name_url_map = kwargs.get('image_name_url_map')
             sdoc_children.extend(parse_html_inline_block(token.content, image_name_url_map))
         else:
-            elements = copy.deepcopy(kwargs)
-            elements.pop('image_name_url_map', '')
-            sdoc_children.append({'id': get_random_id(), 'text': token.content, **elements})
+            sdoc_children.append({'id': get_random_id(), 'text': token.content, **kwargs})
     return sdoc_children
 
 
