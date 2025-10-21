@@ -8,6 +8,7 @@ from markdown_it.tree import SyntaxTreeNode
 from mdit_py_plugins.tasklists import tasklists_plugin
 from mdit_py_plugins.dollarmath import dollarmath_plugin
 from seadoc_converter.config import SEAHUB_SERVICE_URL
+import copy
 
 
 def trans_image_url_to_path(doc_uuid, image_name_url_map):
@@ -78,7 +79,9 @@ def parse_tokens(token_stream, **kwargs):
             image_name_url_map = kwargs.get('image_name_url_map')
             sdoc_children.extend(parse_html_inline_block(token.content, image_name_url_map))
         else:
-            sdoc_children.append({'id': get_random_id(), 'text': token.content, **kwargs})
+            elements = copy.deepcopy(kwargs)
+            elements.pop('image_name_url_map', '')
+            sdoc_children.append({'id': get_random_id(), 'text': token.content, **elements})
     return sdoc_children
 
 
