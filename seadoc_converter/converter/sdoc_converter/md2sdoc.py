@@ -36,11 +36,15 @@ def parse_tokens(token_stream, **kwargs):
     sdoc_children = []
     for token in token_stream:
         if token.type == 'text':
+            elements = copy.deepcopy(kwargs)
+            elements.pop('image_name_url_map', '') 
             text = token.content
-            sdoc_children.append({'id': get_random_id(), 'text': text, **kwargs})
+            sdoc_children.append({'id': get_random_id(), 'text': text, **elements})
         elif token.type == 'code_inline':
+            elements = copy.deepcopy(kwargs)
+            elements.pop('image_name_url_map', '') 
             text = token.content
-            sdoc_children.append({'id': get_random_id(), 'text': text, 'code': True, **kwargs})
+            sdoc_children.append({'id': get_random_id(), 'text': text, 'code': True, **elements})
         elif token.type == 'em':
             sdoc_children.extend(parse_tokens(token.children, italic=True, **kwargs))
         elif token.type == 'strong':
