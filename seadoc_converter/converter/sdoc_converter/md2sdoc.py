@@ -32,6 +32,7 @@ def get_random_id():
 
 
 def parse_tokens(token_stream, **kwargs):
+    image_name_url_map = kwargs.pop('image_name_url_map', {})
     empty_elem = {'id': get_random_id(), 'text': ''}
     sdoc_children = []
     for token in token_stream:
@@ -62,7 +63,7 @@ def parse_tokens(token_stream, **kwargs):
             }
             sdoc_children.extend([empty_elem, link_struct, empty_elem])
         elif token.type == 'image':
-            image_name_url_map = kwargs.get('image_name_url_map')
+            # image_name_url_map = kwargs.get('image_name_url_map')
             image_name = f'{uuid.uuid4().hex[:8]}.png'
             image_src = token.attrs.get('src')
             image_name_url_map[image_name] = image_src
@@ -80,7 +81,7 @@ def parse_tokens(token_stream, **kwargs):
                 img_struct['data']['height'] = float(height)
             sdoc_children.extend([empty_elem, img_struct, empty_elem])
         elif token.type in {'html_block', 'html_inline'}:
-            image_name_url_map = kwargs.get('image_name_url_map')
+            # image_name_url_map = kwargs.get('image_name_url_map')
             sdoc_children.extend(parse_html_inline_block(token.content, image_name_url_map))
         else:
             elements = copy.deepcopy(kwargs)
