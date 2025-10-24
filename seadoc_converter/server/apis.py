@@ -13,7 +13,7 @@ from flask import request, Flask, Response
 from seadoc_converter import config
 
 from seadoc_converter.converter.sdoc_converter.docx2sdoc import docx2sdoc
-from seadoc_converter.converter.sdoc_converter.md2sdoc import md2sdoc
+from seadoc_converter.converter.sdoc_converter.md2sdoc import md2sdoc, trans_image_url_to_path
 from seadoc_converter.converter.markdown_converter import sdoc2md
 from seadoc_converter.converter.docx_converter import sdoc2docx
 from seadoc_converter.converter.utils import process_zip_file
@@ -77,10 +77,11 @@ def convert_markdown_to_sdoc():
         file_content = requests.get(download_url).content.decode()
     parent_dir = os.path.dirname(path)
     file_name = os.path.basename(path)
-
+    image_name_url_map = None
     if extension == '.md' and src_type == 'markdown' and dst_type == 'sdoc':
         if file_content:
-            file_content = md2sdoc(file_content, username=username)
+            image_name_url_map = {}
+            file_content = md2sdoc(file_content, username=username, image_name_url_map=image_name_url_map)
         file_name = file_name[:-2] + 'sdoc'
     elif extension == '.docx' and src_type == 'docx' and dst_type == 'sdoc':
         if file_content:
@@ -106,6 +107,11 @@ def convert_markdown_to_sdoc():
         if not resp.ok:
             logger.error(resp.text)
             return {'error_msg': resp.text}, 500
+        
+        if image_name_url_map:
+            success, error_msg = trans_image_url_to_path(doc_uuid, image_name_url_map)
+            if error_msg:
+                logger.error(error_msg)
 
     except Exception as e:
         logger.error(e)
