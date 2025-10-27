@@ -84,7 +84,9 @@ def convert_markdown_to_sdoc():
         file_name = file_name[:-2] + 'sdoc'
     elif extension == '.docx' and src_type == 'docx' and dst_type == 'sdoc':
         if file_content:
-            file_content = docx2sdoc(file_content, username, doc_uuid)
+            file_content, error_msg = docx2sdoc(file_content, username, doc_uuid)
+            if not file_content:
+                return {'error_msg': error_msg}, 400
         file_name = file_name[:-4] + 'sdoc'
     elif extension == '.sdoc' and src_type == 'sdoc' and dst_type == 'markdown':
         if file_content:
