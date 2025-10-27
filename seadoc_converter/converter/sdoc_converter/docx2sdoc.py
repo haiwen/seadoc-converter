@@ -354,8 +354,11 @@ def docx2sdoc(docx, username, docx_uuid):
     children_list = []
     # Fix according to: https://github.com/python-openxml/python-docx/issues/1105s
     _SerializedRelationships.load_from_xml = load_from_xml_v2
-
-    docx = Document(BytesIO(docx))
+    try:
+        docx = Document(BytesIO(docx))
+    except Exception as e:
+        logging.error(e)
+        return None, "Docx file is invalid."
     try:
         numbering_xml = docx.part.numbering_part.element.xml
     except (KeyError, NotImplementedError):
@@ -404,4 +407,4 @@ def docx2sdoc(docx, username, docx_uuid):
         'version': 1,
         'format_version': 4,
     }
-    return sdoc_json
+    return sdoc_json, True
