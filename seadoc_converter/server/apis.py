@@ -257,8 +257,7 @@ def sdoc_export_to_md():
         return {'error_msg': 'download_url invalid.'}, 400
 
     sdoc_content = requests.get(download_url).content.decode()
-
-    md_content = b''
+    md_content = ''
     if extension == '.sdoc' and src_type == 'sdoc' and dst_type == 'md':
         if sdoc_content:
             sdoc_content_json = json.loads(sdoc_content)
@@ -268,8 +267,14 @@ def sdoc_export_to_md():
 
     if isinstance(md_content, dict):
         md_content = json.dumps(md_content)
+    
+    if isinstance(md_content, str):
+        response_content = md_content.encode()  # str -> bytes
+    else:
+        response_content = md_content 
+
     return Response(
-        md_content.encode(),
+        response_content,
         mimetype='application/octet-stream',
     )
 
