@@ -340,7 +340,6 @@ def handle_image_block(json_data, doc_uuid=''):
     return ''
 
 
-
 def json2md(json_data, doc_uuid=''):
     doc_type = json_data.get('type')
     markdown_output = ''
@@ -388,7 +387,8 @@ def json2md(json_data, doc_uuid=''):
 
 def sdoc2md(json_tree, doc_uuid=''):
     results = []
-    for sub in json_tree.get('elements'):
+    elements = json_tree.get('elements', []) or json_tree.get('children', [])
+    for sub in elements:
         results.append(json2md(sub, doc_uuid))
 
     markdown_text = "\n".join(results)
