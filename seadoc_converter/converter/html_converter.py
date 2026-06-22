@@ -1553,8 +1553,14 @@ def render_link(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
         </a>
     </span>
     """
-    href = escape_html(sdoc_json['href'])
     title = escape_html(sdoc_json['title'])
+
+    href = escape_html(sdoc_json.get('href', ''))
+    if not href:
+        href = escape_html(sdoc_json.get('src', ''))
+    if not href:
+        href = escape_html(sdoc_json.get('url', ''))
+
     linked_id = escape_html(sdoc_json.get('linked_id', ''))
     linked_wiki_page_id = escape_html(sdoc_json.get('linked_wiki_page_id', ''))
 
