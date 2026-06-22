@@ -36,6 +36,27 @@ def trans_img_path_to_url(image_path, doc_uuid):
     })
 
 
+def trans_video_path_to_url(video_path, doc_uuid):
+    if is_url_link(video_path):
+        return video_path
+
+    return "%(server_url)s/%(tag)s/%(doc_uuid)s/%(video_path)s" % ({
+        'server_url': SEAHUB_SERVICE_URL.rstrip('/'),
+        'tag': 'api/v2.1/seadoc/download-video',
+        'doc_uuid': doc_uuid,
+        'video_path': video_path.strip('/')
+    })
+
+
+def trans_wiki_page_id_to_url(publish_url, wiki_page_id):
+
+    return "%(server_url)s/wiki/publish/%(publish_url)s/%(wiki_page_id)s" % ({
+        'server_url': SEAHUB_SERVICE_URL.rstrip('/'),
+        'publish_url': publish_url,
+        'wiki_page_id': wiki_page_id
+    })
+
+
 def gen_jwt_auth_header(payload):
 
     jwt_token = jwt.encode(payload, SEADOC_PRIVATE_KEY, algorithm='HS256')
