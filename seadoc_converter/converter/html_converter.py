@@ -1555,8 +1555,8 @@ def render_link(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
     """
     href = escape_html(sdoc_json['href'])
     title = escape_html(sdoc_json['title'])
-    linked_id = escape_html(sdoc_json['linked_id'])
-    linked_wiki_page_id = escape_html(sdoc_json['linked_wiki_page_id'])
+    linked_id = escape_html(sdoc_json.get('linked_id', ''))
+    linked_wiki_page_id = escape_html(sdoc_json.get('linked_wiki_page_id', ''))
 
     children_html = indent_html("".join(
         render_node(child, doc_uuid=doc_uuid, parent_id=parent_id, publish_url=publish_url)
@@ -1890,5 +1890,8 @@ def sdoc2html(sdoc_str, doc_uuid='', publish_url=''):
         doc = json.loads(sdoc_str)
 
     elements = doc.get('elements', [])
+    if not elements:
+        elements = doc.get('children', [])
+
     html = "".join(render_node(element, doc_uuid=doc_uuid, publish_url=publish_url) for element in elements)
     return html
