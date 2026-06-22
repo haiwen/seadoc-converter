@@ -16,6 +16,7 @@ from seadoc_converter.converter.sdoc_converter.docx2sdoc import docx2sdoc
 from seadoc_converter.converter.sdoc_converter.md2sdoc import md2sdoc, trans_image_url_to_path
 from seadoc_converter.converter.markdown_converter import sdoc2md
 from seadoc_converter.converter.docx_converter import sdoc2docx
+from seadoc_converter.converter.html_converter import sdoc2html
 from seadoc_converter.converter.utils import process_zip_file
 
 logger = logging.getLogger(__name__)
@@ -278,6 +279,111 @@ def sdoc_export_to_md():
     return Response(
         response_content,
         mimetype='application/octet-stream',
+    )
+
+
+@flask_app.route('/api/v1/sdoc-convert-to-html/', methods=['POST'])
+def sdoc_convert_to_html():
+    """Convert an .sdoc file to HTML and upload the result."""
+    is_valid = check_auth_token(request)
+    if not is_valid:
+        return {'error_msg': 'Permission denied'}, 403
+
+    try:
+        data = json.loads(request.data)
+    except Exception as e:
+        logger.exception(e)
+        return {'error_msg': 'Bad request.'}, 400
+
+    path = data.get('path')
+    doc_uuid = data.get('doc_uuid')
+    src_type = data.get('src_type')
+    dst_type = data.get('dst_type')
+    download_url = data.get('download_url')
+    upload_url = data.get('upload_url')
+
+    extension = Path(path).suffix
+    if extension not in ['.sdoc']:
+        return {'error_msg': 'path invalid.'}, 400
+
+    if not download_url:
+        return {'error_msg': 'download_url invalid.'}, 400
+
+    if not upload_url:
+        return {'error_msg': 'upload_url invalid.'}, 400
+
+    if not (extension == '.sdoc' and src_type == 'sdoc' and dst_type == 'html'):
+        return {'error_msg': 'unsupported convert type.'}, 400
+
+    sdoc_content = requests.get(download_url).content.decode()
+    if not sdoc_content:
+        return {'error_msg': 'Empty sdoc content.'}, 400
+
+    html_body = sdoc2html(sdoc_content, doc_uuid=doc_uuid)
+
+    parent_dir = os.path.dirname(path)
+    filename = os.path.basename(path)
+    new_filename = filename[:-5] + '.html'
+    new_file_path = os.path.join(parent_dir, new_filename)
+
+    try:
+        resp = requests.post(
+            upload_url,
+            data={'target_file': new_file_path, 'parent_dir': parent_dir},
+            files={'file': (new_filename, html_body.encode())},
+        )
+        if not resp.ok:
+            logger.error(resp.text)
+            return {'error_msg': resp.text}, 500
+    except Exception as e:
+        logger.error(e)
+        return {'error_msg': 'Internal Server Error'}, 500
+
+    return {'success': True}, 200
+
+
+@flask_app.route('/api/v1/sdoc-export-to-html/', methods=['POST'])
+def sdoc_export_to_html():
+    """Export an .sdoc file as an HTML response (direct download)."""
+    is_valid = check_auth_token(request)
+    if not is_valid:
+        return {'error_msg': 'Permission denied'}, 403
+
+    try:
+        data = json.loads(request.data)
+    except Exception as e:
+        logger.exception(e)
+        return {'error_msg': 'Bad request.'}, 400
+
+    path = data.get('path')
+    doc_uuid = data.get('doc_uuid')
+    src_type = data.get('src_type')
+    dst_type = data.get('dst_type')
+    download_url = data.get('download_url')
+    publish_url = data.get('publish_url')
+
+    extension = Path(path).suffix
+    if extension not in ['.sdoc']:
+        return {'error_msg': 'path invalid.'}, 400
+
+    if not download_url:
+        return {'error_msg': 'download_url invalid.'}, 400
+
+    if not (extension == '.sdoc' and src_type == 'sdoc' and dst_type == 'html'):
+        return {'error_msg': 'unsupported convert type.'}, 400
+
+    sdoc_content = requests.get(download_url).content.decode()
+    if not sdoc_content:
+        return {'error_msg': 'Empty sdoc content.'}, 400
+
+    html_body = sdoc2html(sdoc_content, doc_uuid=doc_uuid, publish_url=publish_url)
+
+    filename = os.path.basename(path)
+    new_filename = quote(filename[:-5] + '.html')
+    return Response(
+        html_body.encode(),
+        mimetype='text/html',
+        headers={'Content-Disposition': f'attachment; filename={new_filename}'},
     )
 
 

@@ -10,3 +10,5 @@ markdown-it-py==4.0.0
 mdit_py_plugins==0.5.*
 linkify-it-py==2.0.3
 html-to-markdown==2.27.*
+matplotlib==3.10.*
+Pygments==2.19.*
