@@ -272,12 +272,12 @@ def render_table_cell(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
         style_parts.append('display: none;')
 
     if row_index == '1' and col_index == '1':
-        style_parts.append('border-top: 1px solid rgb(221, 221, 221);')
-        style_parts.append('border-left: 1px solid rgb(221, 221, 221);')
+        style_parts.append('border-top: 1px solid')
+        style_parts.append('border-left: 1px solid')
     elif row_index == '1':
-        style_parts.append('border-top: 1px solid rgb(221, 221, 221);')
+        style_parts.append('border-top: 1px solid')
     elif col_index == '1':
-        style_parts.append('border-left: 1px solid rgb(221, 221, 221);')
+        style_parts.append('border-left: 1px solid')
 
     style_parts.append(
         f'grid-area: {escape_html(row_index)} / {escape_html(col_index)} / span {rowspan} / span {colspan};'
@@ -1453,7 +1453,6 @@ def render_embed_link(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
 
     link = escape_html(sdoc_json['link'])
     link_type = escape_html(sdoc_json['link_type'])
-    inline_style = "height: 300px; max-height: 550px;"
 
     html = f"""
     <div
@@ -1463,7 +1462,7 @@ def render_embed_link(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
         data-root="true"
         contenteditable="false"
     >
-        <div class="sdoc-embed-link-container" scrolling="no" style="{inline_style}">
+        <div class="sdoc-embed-link-container" scrolling="no">
             <iframe class="sdoc-embed-link-element {link_type}" title="{link}" src="{link}"></iframe>
             <div class="iframe-overlay"></div>
         </div>
@@ -1732,7 +1731,6 @@ def render_image(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
     image_src = sdoc_json['data']['src']
     image_src = escape_html(trans_img_path_to_url(image_src, doc_uuid))
     parent_id = escape_html(parent_id)
-    inline_style = "border-width: medium; border-style: none; border-color: currentcolor; border-image: initial;"
 
     html = f"""
     <span
@@ -1746,7 +1744,7 @@ def render_image(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
     >
         <span class="sdoc-image-inner">
             <span class="sdoc-image-content">
-                <span style="{inline_style}">
+                <span>
                     <img
                         class=""
                         src="{image_src}"
