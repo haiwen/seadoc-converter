@@ -272,12 +272,16 @@ def render_table_cell(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
         style_parts.append('display: none;')
 
     if row_index == '1' and col_index == '1':
-        style_parts.append('border-top: 1px solid')
-        style_parts.append('border-left: 1px solid')
+        style_parts.append('border-top-width: 1px;')
+        style_parts.append('border-top-style: solid;')
+        style_parts.append('border-left-width: 1px;')
+        style_parts.append('border-left-style: solid;')
     elif row_index == '1':
-        style_parts.append('border-top: 1px solid')
+        style_parts.append('border-top-width: 1px;')
+        style_parts.append('border-top-style: solid;')
     elif col_index == '1':
-        style_parts.append('border-left: 1px solid')
+        style_parts.append('border-left-width: 1px;')
+        style_parts.append('border-left-style: solid;')
 
     style_parts.append(
         f'grid-area: {escape_html(row_index)} / {escape_html(col_index)} / span {rowspan} / span {colspan};'
@@ -1381,22 +1385,29 @@ def render_header(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
     """
     sdoc:
     {
-        "id": "GOFeQtRbQByKsO41bVw29g",
+        "id": "046ae9d4-0538-4bfd-973a-d8506687ae2e",
         "type": "header1",
         "children": []
     },
 
     html:
     <div
-        data-id="GOFeQtRbQByKsO41bVw29g"
-        id="GOFeQtRbQByKsO41bVw29g"
+        data-id="046ae9d4-0538-4bfd-973a-d8506687ae2e"
+        id="046ae9d4-0538-4bfd-973a-d8506687ae2e"
         data-slate-node="element"
         class="sdoc-header-1"
         data-root="true"
         style="font-size: 20pt;"
     >
+        <div class="sdoc-header-row">
+            <span class="sdoc-header-collapse-prefix sdoc-header-collapse-prefix-visible" contenteditable="false">
+                <span class="sdocfont sdoc-big-drop-down">
+                </span>
+            </span>
+            <div class="sdoc-header-content">
+            </div>
+        </div>
     </div>
-
     """
 
     ele_id = escape_html(sdoc_json['id'])
@@ -1418,7 +1429,15 @@ def render_header(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
         data-root="true"
         style="{inline_style}"
     >
-        {children_html}
+        <div class="sdoc-header-row">
+            <span class="sdoc-header-collapse-prefix sdoc-header-collapse-prefix-visible" contenteditable="false">
+                <span class="sdocfont sdoc-big-drop-down">
+                </span>
+            </span>
+            <div class="sdoc-header-content">
+                {children_html}
+            </div>
+        </div>
     </div>
     """
 
