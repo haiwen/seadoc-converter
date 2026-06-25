@@ -1400,7 +1400,7 @@ def render_header(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
         style="font-size: 20pt;"
     >
         <div class="sdoc-header-row">
-            <span class="sdoc-header-collapse-prefix sdoc-header-collapse-prefix-visible" contenteditable="false">
+            <span class="sdoc-header-collapse-prefix" contenteditable="false">
                 <span class="sdocfont sdoc-big-drop-down">
                 </span>
             </span>
@@ -1430,7 +1430,7 @@ def render_header(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
         style="{inline_style}"
     >
         <div class="sdoc-header-row">
-            <span class="sdoc-header-collapse-prefix sdoc-header-collapse-prefix-visible" contenteditable="false">
+            <span class="sdoc-header-collapse-prefix" contenteditable="false">
                 <span class="sdocfont sdoc-big-drop-down">
                 </span>
             </span>
