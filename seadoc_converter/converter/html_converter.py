@@ -272,12 +272,16 @@ def render_table_cell(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
         style_parts.append('display: none;')
 
     if row_index == '1' and col_index == '1':
-        style_parts.append('border-top: 1px solid rgb(221, 221, 221);')
-        style_parts.append('border-left: 1px solid rgb(221, 221, 221);')
+        style_parts.append('border-top-width: 1px;')
+        style_parts.append('border-top-style: solid;')
+        style_parts.append('border-left-width: 1px;')
+        style_parts.append('border-left-style: solid;')
     elif row_index == '1':
-        style_parts.append('border-top: 1px solid rgb(221, 221, 221);')
+        style_parts.append('border-top-width: 1px;')
+        style_parts.append('border-top-style: solid;')
     elif col_index == '1':
-        style_parts.append('border-left: 1px solid rgb(221, 221, 221);')
+        style_parts.append('border-left-width: 1px;')
+        style_parts.append('border-left-style: solid;')
 
     style_parts.append(
         f'grid-area: {escape_html(row_index)} / {escape_html(col_index)} / span {rowspan} / span {colspan};'
@@ -1381,22 +1385,29 @@ def render_header(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
     """
     sdoc:
     {
-        "id": "GOFeQtRbQByKsO41bVw29g",
+        "id": "046ae9d4-0538-4bfd-973a-d8506687ae2e",
         "type": "header1",
         "children": []
     },
 
     html:
     <div
-        data-id="GOFeQtRbQByKsO41bVw29g"
-        id="GOFeQtRbQByKsO41bVw29g"
+        data-id="046ae9d4-0538-4bfd-973a-d8506687ae2e"
+        id="046ae9d4-0538-4bfd-973a-d8506687ae2e"
         data-slate-node="element"
         class="sdoc-header-1"
         data-root="true"
         style="font-size: 20pt;"
     >
+        <div class="sdoc-header-row">
+            <span class="sdoc-header-collapse-prefix" contenteditable="false">
+                <span class="sdocfont sdoc-big-drop-down">
+                </span>
+            </span>
+            <div class="sdoc-header-content">
+            </div>
+        </div>
     </div>
-
     """
 
     ele_id = escape_html(sdoc_json['id'])
@@ -1418,7 +1429,15 @@ def render_header(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
         data-root="true"
         style="{inline_style}"
     >
-        {children_html}
+        <div class="sdoc-header-row">
+            <span class="sdoc-header-collapse-prefix" contenteditable="false">
+                <span class="sdocfont sdoc-big-drop-down">
+                </span>
+            </span>
+            <div class="sdoc-header-content">
+                {children_html}
+            </div>
+        </div>
     </div>
     """
 
@@ -1453,7 +1472,6 @@ def render_embed_link(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
 
     link = escape_html(sdoc_json['link'])
     link_type = escape_html(sdoc_json['link_type'])
-    inline_style = "height: 300px; max-height: 550px;"
 
     html = f"""
     <div
@@ -1463,7 +1481,7 @@ def render_embed_link(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
         data-root="true"
         contenteditable="false"
     >
-        <div class="sdoc-embed-link-container" scrolling="no" style="{inline_style}">
+        <div class="sdoc-embed-link-container" scrolling="no">
             <iframe class="sdoc-embed-link-element {link_type}" title="{link}" src="{link}"></iframe>
             <div class="iframe-overlay"></div>
         </div>
@@ -1732,7 +1750,6 @@ def render_image(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
     image_src = sdoc_json['data']['src']
     image_src = escape_html(trans_img_path_to_url(image_src, doc_uuid))
     parent_id = escape_html(parent_id)
-    inline_style = "border-width: medium; border-style: none; border-color: currentcolor; border-image: initial;"
 
     html = f"""
     <span
@@ -1746,7 +1763,7 @@ def render_image(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
     >
         <span class="sdoc-image-inner">
             <span class="sdoc-image-content">
-                <span style="{inline_style}">
+                <span>
                     <img
                         class=""
                         src="{image_src}"
