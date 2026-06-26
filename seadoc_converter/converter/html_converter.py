@@ -218,32 +218,722 @@ def render_table_cell(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
     """
     sdoc:
     {
-        "id": "bfmP84cjQpifBDAC9tKGaQ",
+        "id": "Hupee9t8QqS-nGipbCOyXw",
         "type": "table_cell",
         "children": [
             {
-                "text": "123",
-                "id": "Ww-91tMXRtS7HsBrY7o_Pg"
+                "text": "",
+                "id": "K3FuUsc1Rc2JPO5o2GQZGA"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    },
+    {
+        "id": "fhm93vIKT0K9IJycLzvGvg",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "",
+                "id": "TbYjMpGGQEG0_GtkF66WmQ"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    },
+    {
+        "id": "Ot0nGBu9Q6iv2E0OnYXFrA",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "",
+                "id": "BAOsWochS5a8KMJSmc3Fww"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    },
+    {
+        "id": "HYYX-lehSCSbZYIDNEs-sw",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "",
+                "id": "EsgNhPjuSyuFiOmhBm9fAg"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    }
+    {
+        "id": "KpQxF6bPRte8faD0tam1tw",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "",
+                "id": "T3PotNMVReKfqBPW5jJ7iQ"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    },
+    {
+        "id": "aBgplWqMQnOUqL1xy7XIQA",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "",
+                "id": "KM2SQ672QrGSeUf7vs845Q"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    },
+    {
+        "id": "eisa7ZbDQYyagq7i9-haNw",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "",
+                "id": "aA-VM88DQrG6FUyFAsIMWQ"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    },
+    {
+        "id": "KHxfs97uToCPZuNLpQ_eQw",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "",
+                "id": "UCIf6y1qRDSnTCEu7dEorA"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    {
+        "id": "C4UqaFPOQVKSwlubrtCXxQ",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "",
+                "id": "JjfSy-qfQfu7JO3h3SMaUg"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    },
+    {
+        "id": "IczfPRmfR7iT2TTyr8-fjA",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "",
+                "id": "HkpRhcsVQom7Jfb5l6HIMA"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    },
+    {
+        "id": "dsnDl1-eSV2h0vm5RaF-0Q",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "",
+                "id": "WrC3WA8NTka6kujUbBtN3g"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    },
+    {
+        "id": "d8FYhgmoSDubON9v0Zyvsg",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "",
+                "id": "HghaOX2xQkaP9lT00lwE9A"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    }
+    {
+        "id": "ZWxigfEqRLGvz21Rv0f70A",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "",
+                "id": "SktbO9sBSnWTJardHr34kA"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    },
+    {
+        "id": "SDE6dXhpQ4qT3V9RryX-nA",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "",
+                "id": "bpTr3jOyRUeutnYPRDg8Ww"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    },
+    {
+        "id": "cJmgNBR_RhC9QUzd25DJxQ",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "",
+                "id": "E7trVy-0QyeOeB87usEw0A"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    },
+    {
+        "id": "WPNCE83GSwKoXJW6UqI61A",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "",
+                "id": "VgTEzyP3SpGHRJcN99GT1Q"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    }
+    {
+        "id": "QdnZqx0LRYS8x2OXbJngPg",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "1",
+                "id": "bQQ0jmoUQY6SHCgBDcaQrg"
             }
         ],
         "style": {
-            "background_color": "#FF0000",
-            "text_align": "center",
-            "alignItems": "center"
+            "text_align": "left"
         },
-        "inherit_style": {},
-        "rowspan": 1,
-        "colspan": 1
+        "inherit_style": {}
     },
+    {
+        "id": "UM_B8B8PSCCs_fL1uhXdrg",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "2",
+                "id": "WV7svvfyQzu8QZcs-cYTCw"
+            }
+        ],
+        "style": {
+            "text_align": "center"
+        },
+        "inherit_style": {}
+    },
+    {
+        "id": "IovEIV03Qj2GNkX8yqNCnQ",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "3",
+                "id": "SbClsRgEQliu3oyMLPyUSA"
+            }
+        ],
+        "style": {
+            "text_align": "right"
+        },
+        "inherit_style": {}
+    },
+    {
+        "id": "RS4Aj-J7SyezINbP7nH2Yw",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "4",
+                "id": "WAg9iRsGRCiu1M2fdSLS8Q"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    }
+    {
+        "id": "ODb5FtUXS_mEj_lURH0keQ",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "5",
+                "id": "ShdtKVDxRhGVIfPhTPEO_g"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    },
+    {
+        "id": "YOxpYHakSquQdK6LS-Q11A",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "6",
+                "id": "VsmqqztNTtyvupIHdXe0FA"
+            }
+        ],
+        "style": {
+            "align_items": "center"
+        },
+        "inherit_style": {}
+    },
+    {
+        "id": "OBFRaFLnT1ubjryO7d-amQ",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "7",
+                "id": "QfiIWlwIRUyK_y6uezAsrA"
+            }
+        ],
+        "style": {
+            "align_items": "flex-end"
+        },
+        "inherit_style": {}
+    },
+    {
+        "id": "H_jKONykTf6BuZkH19BCjg",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "8",
+                "id": "bnCAhujFSzWlYBcBRqz1Rg"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    }
+    {
+        "id": "EWWIxnRZQTqCllaAzvUsPQ",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "a",
+                "id": "GdGNqE5SSbyMozog5QwGyg"
+            }
+        ],
+        "style": {
+            "background_color": "#914545"
+        },
+        "inherit_style": {
+            "background_color": "#914545"
+        }
+    },
+    {
+        "id": "dRgUvTYAQhmzBoKPGOf2lg",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "b",
+                "id": "JikQW7nsTaSGLHHo-QqyNQ"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    },
+    {
+        "id": "Z4pMgACeSHmWW8FYwAKeMg",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "c",
+                "id": "DJnwbU28TI2kC4Lzgg4HCA"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    },
+    {
+        "id": "bMYn3SGNQKWglJmurgP4Tg",
+        "type": "table_cell",
+        "children": [
+            {
+                "text": "d",
+                "id": "I_rzru8OTQqXO_s1_ufFoQ"
+            }
+        ],
+        "style": {},
+        "inherit_style": {}
+    }
 
     html:
-    <div
-        data-slate-node="element"
-        class="table-cell"
-        data-id="bfmP84cjQpifBDAC9tKGaQ"
-        style="align-items: center; text-align: center; background-color: #FF0000; border-top: 1px solid rgb(221, 221, 221); border-left: 1px solid rgb(221, 221, 221); grid-area: 1 / 1 / span 1 / span 1;"
-    >
+    <div data-slate-node="element" class="table-cell sdoc-table-header-2367f2"
+    data-id="Hupee9t8QqS-nGipbCOyXw" style="border-top: 1px solid rgb(221, 221, 221); border-left: 1px solid rgb(221, 221, 221); grid-area: 1 / 1 / span 1 / span 1;">
         <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="K3FuUsc1Rc2JPO5o2GQZGA" data-slate-leaf="true" class="id"
+                style="padding-left: 0.1px;">
+                    <span data-slate-zero-width="n" data-slate-length="0">
+
+                        <br>
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell sdoc-table-header-2367f2"
+    data-id="fhm93vIKT0K9IJycLzvGvg" style="border-top: 1px solid rgb(221, 221, 221); grid-area: 1 / 2 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="TbYjMpGGQEG0_GtkF66WmQ" data-slate-leaf="true" class="id"
+                style="padding-left: 0.1px;">
+                    <span data-slate-zero-width="n" data-slate-length="0">
+
+                        <br>
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell sdoc-table-header-2367f2"
+    data-id="Ot0nGBu9Q6iv2E0OnYXFrA" style="border-top: 1px solid rgb(221, 221, 221); grid-area: 1 / 3 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="BAOsWochS5a8KMJSmc3Fww" data-slate-leaf="true" class="id"
+                style="padding-left: 0.1px;">
+                    <span data-slate-zero-width="n" data-slate-length="0">
+
+                        <br>
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell sdoc-table-header-2367f2"
+    data-id="HYYX-lehSCSbZYIDNEs-sw" style="border-top: 1px solid rgb(221, 221, 221); grid-area: 1 / 4 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="EsgNhPjuSyuFiOmhBm9fAg" data-slate-leaf="true" class="id"
+                style="padding-left: 0.1px;">
+                    <span data-slate-zero-width="n" data-slate-length="0">
+
+                        <br>
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell" data-id="KpQxF6bPRte8faD0tam1tw"
+    style="border-left: 1px solid rgb(221, 221, 221); grid-area: 2 / 1 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="T3PotNMVReKfqBPW5jJ7iQ" data-slate-leaf="true" class="id"
+                style="padding-left: 0.1px;">
+                    <span data-slate-zero-width="n" data-slate-length="0">
+
+                        <br>
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell" data-id="aBgplWqMQnOUqL1xy7XIQA"
+    style="grid-area: 2 / 2 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="KM2SQ672QrGSeUf7vs845Q" data-slate-leaf="true" class="id"
+                style="padding-left: 0.1px;">
+                    <span data-slate-zero-width="n" data-slate-length="0">
+
+                        <br>
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell" data-id="eisa7ZbDQYyagq7i9-haNw"
+    style="grid-area: 2 / 3 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="aA-VM88DQrG6FUyFAsIMWQ" data-slate-leaf="true" class="id"
+                style="padding-left: 0.1px;">
+                    <span data-slate-zero-width="n" data-slate-length="0">
+
+                        <br>
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell" data-id="KHxfs97uToCPZuNLpQ_eQw"
+    style="grid-area: 2 / 4 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="UCIf6y1qRDSnTCEu7dEorA" data-slate-leaf="true" class="id"
+                style="padding-left: 0.1px;">
+                    <span data-slate-zero-width="n" data-slate-length="0">
+
+                        <br>
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell sdoc-table-body-2367f2"
+    data-id="C4UqaFPOQVKSwlubrtCXxQ" style="border-left: 1px solid rgb(221, 221, 221); grid-area: 3 / 1 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="JjfSy-qfQfu7JO3h3SMaUg" data-slate-leaf="true" class="id"
+                style="padding-left: 0.1px;">
+                    <span data-slate-zero-width="n" data-slate-length="0">
+
+                        <br>
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell sdoc-table-body-2367f2"
+    data-id="IczfPRmfR7iT2TTyr8-fjA" style="grid-area: 3 / 2 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="HkpRhcsVQom7Jfb5l6HIMA" data-slate-leaf="true" class="id"
+                style="padding-left: 0.1px;">
+                    <span data-slate-zero-width="n" data-slate-length="0">
+
+                        <br>
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell sdoc-table-body-2367f2"
+    data-id="dsnDl1-eSV2h0vm5RaF-0Q" style="grid-area: 3 / 3 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="WrC3WA8NTka6kujUbBtN3g" data-slate-leaf="true" class="id"
+                style="padding-left: 0.1px;">
+                    <span data-slate-zero-width="n" data-slate-length="0">
+
+                        <br>
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell sdoc-table-body-2367f2"
+    data-id="d8FYhgmoSDubON9v0Zyvsg" style="grid-area: 3 / 4 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="HghaOX2xQkaP9lT00lwE9A" data-slate-leaf="true" class="id"
+                style="padding-left: 0.1px;">
+                    <span data-slate-zero-width="n" data-slate-length="0">
+
+                        <br>
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell" data-id="ZWxigfEqRLGvz21Rv0f70A"
+    style="border-left: 1px solid rgb(221, 221, 221); grid-area: 4 / 1 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="SktbO9sBSnWTJardHr34kA" data-slate-leaf="true" class="id"
+                style="padding-left: 0.1px;">
+                    <span data-slate-zero-width="n" data-slate-length="0">
+
+                        <br>
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell" data-id="SDE6dXhpQ4qT3V9RryX-nA"
+    style="grid-area: 4 / 2 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="bpTr3jOyRUeutnYPRDg8Ww" data-slate-leaf="true" class="id"
+                style="padding-left: 0.1px;">
+                    <span data-slate-zero-width="n" data-slate-length="0">
+
+                        <br>
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell" data-id="cJmgNBR_RhC9QUzd25DJxQ"
+    style="grid-area: 4 / 3 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="E7trVy-0QyeOeB87usEw0A" data-slate-leaf="true" class="id"
+                style="padding-left: 0.1px;">
+                    <span data-slate-zero-width="n" data-slate-length="0">
+
+                        <br>
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell" data-id="WPNCE83GSwKoXJW6UqI61A"
+    style="grid-area: 4 / 4 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="VgTEzyP3SpGHRJcN99GT1Q" data-slate-leaf="true" class="id"
+                style="padding-left: 0.1px;">
+                    <span data-slate-zero-width="n" data-slate-length="0">
+
+                        <br>
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell" data-id="QdnZqx0LRYS8x2OXbJngPg"
+    style="text-align: left; border-top: 1px solid rgb(221, 221, 221); border-left: 1px solid rgb(221, 221, 221); grid-area: 1 / 1 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="bQQ0jmoUQY6SHCgBDcaQrg" data-slate-leaf="true" class="id">
+                    <span data-slate-string="true">
+                        1
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell" data-id="UM_B8B8PSCCs_fL1uhXdrg"
+    style="text-align: center; border-top: 1px solid rgb(221, 221, 221); grid-area: 1 / 2 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="WV7svvfyQzu8QZcs-cYTCw" data-slate-leaf="true" class="id">
+                    <span data-slate-string="true">
+                        2
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell" data-id="IovEIV03Qj2GNkX8yqNCnQ"
+    style="text-align: right; border-top: 1px solid rgb(221, 221, 221); grid-area: 1 / 3 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="SbClsRgEQliu3oyMLPyUSA" data-slate-leaf="true" class="id">
+                    <span data-slate-string="true">
+                        3
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell" data-id="RS4Aj-J7SyezINbP7nH2Yw"
+    style="border-top: 1px solid rgb(221, 221, 221); grid-area: 1 / 4 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="WAg9iRsGRCiu1M2fdSLS8Q" data-slate-leaf="true" class="id">
+                    <span data-slate-string="true">
+                        4
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell" data-id="ODb5FtUXS_mEj_lURH0keQ"
+    style="border-left: 1px solid rgb(221, 221, 221); grid-area: 2 / 1 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="ShdtKVDxRhGVIfPhTPEO_g" data-slate-leaf="true" class="id">
+                    <span data-slate-string="true">
+                        5
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell" data-id="YOxpYHakSquQdK6LS-Q11A"
+    style="align-items: center; grid-area: 2 / 2 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="VsmqqztNTtyvupIHdXe0FA" data-slate-leaf="true" class="id">
+                    <span data-slate-string="true">
+                        6
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell" data-id="OBFRaFLnT1ubjryO7d-amQ"
+    style="align-items: flex-end; grid-area: 2 / 3 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="QfiIWlwIRUyK_y6uezAsrA" data-slate-leaf="true" class="id">
+                    <span data-slate-string="true">
+                        7
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell" data-id="H_jKONykTf6BuZkH19BCjg"
+    style="grid-area: 2 / 4 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="bnCAhujFSzWlYBcBRqz1Rg" data-slate-leaf="true" class="id">
+                    <span data-slate-string="true">
+                        8
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell" data-id="EWWIxnRZQTqCllaAzvUsPQ"
+    style="background-color: rgb(145, 69, 69); border-left: 1px solid rgb(221, 221, 221); grid-area: 3 / 1 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="GdGNqE5SSbyMozog5QwGyg" data-slate-leaf="true" class="id">
+                    <span data-slate-string="true">
+                        a
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell" data-id="dRgUvTYAQhmzBoKPGOf2lg"
+    style="grid-area: 3 / 2 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="JikQW7nsTaSGLHHo-QqyNQ" data-slate-leaf="true" class="id">
+                    <span data-slate-string="true">
+                        b
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell" data-id="Z4pMgACeSHmWW8FYwAKeMg"
+    style="grid-area: 3 / 3 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="DJnwbU28TI2kC4Lzgg4HCA" data-slate-leaf="true" class="id">
+                    <span data-slate-string="true">
+                        c
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div data-slate-node="element" class="table-cell" data-id="bMYn3SGNQKWglJmurgP4Tg"
+    style="grid-area: 3 / 4 / span 1 / span 1;">
+        <div class="sdoc-cell-container">
+            <span data-slate-node="text">
+                <span data-id="I_rzru8OTQqXO_s1_ufFoQ" data-slate-leaf="true" class="id">
+                    <span data-slate-string="true">
+                        d
+                    </span>
+                </span>
+            </span>
         </div>
     </div>
     """
@@ -251,20 +941,29 @@ def render_table_cell(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
     ele_id = escape_html(sdoc_json['id'])
     row_index = escape_html(sdoc_json.get('_row_index', 1))
     col_index = escape_html(sdoc_json.get('_col_index', 1))
+    alternate_highlight = sdoc_json.get('alternate_highlight', False)
+    alternate_highlight_color = sdoc_json.get('alternate_highlight_color', '')
     rowspan = escape_html(sdoc_json.get('rowspan', 1))
     colspan = escape_html(sdoc_json.get('colspan', 1))
     style = sdoc_json.get('style', {})
+    inherit_style = sdoc_json.get('inherit_style', {})
 
     style_parts = []
-    align_items = style.get('alignItems')
+    align_items = style.get('align_items')
+    if not align_items:
+        align_items = inherit_style.get('align_items')
     if align_items:
         style_parts.append(f'align-items: {escape_html(align_items)};')
 
     text_align = style.get('text_align')
+    if not text_align:
+        text_align = inherit_style.get('text_align')
     if text_align:
         style_parts.append(f'text-align: {escape_html(text_align)};')
 
     background_color = style.get('background_color')
+    if not background_color:
+        background_color = inherit_style.get('background_color')
     if background_color:
         style_parts.append(f'background-color: {escape_html(background_color)};')
 
@@ -290,7 +989,10 @@ def render_table_cell(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
     inline_style = ' '.join(style_parts)
 
     if sdoc_json.get('is_combined'):
-        text_id = escape_html(sdoc_json.get('children', [{}])[0].get('id', ''))
+        text_id = ''
+        children = sdoc_json.get('children', [])
+        if children and isinstance(children[0], dict):
+            text_id = escape_html(children[0].get('id', ''))
         children_html = """
         <span data-slate-node="text">
             <span
@@ -311,10 +1013,13 @@ def render_table_cell(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
             for child in sdoc_json.get('children', [])
         ))
 
+    if int(row_index) % 2 == 0:
+        alternate_highlight_color = ''
+
     html = f"""
     <div
         data-slate-node="element"
-        class="table-cell"
+        class="table-cell {alternate_highlight_color}"
         data-id="{ele_id}"
         style="{inline_style}"
     >
@@ -367,23 +1072,27 @@ def render_table_row(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
 
     ele_id = escape_html(sdoc_json['id'])
     row_index = escape_html(sdoc_json.get('_row_index', 1))
+    alternate_highlight = escape_html(sdoc_json.get('alternate_highlight', False))
+    alternate_highlight_color = escape_html(sdoc_json.get('alternate_highlight_color', ''))
 
     cell_html = []
     for index, child in enumerate(sdoc_json.get('children', []), start=1):
-        if child.get('type') == 'table_cell':
-            cell_html.append(render_table_cell(
-                {**child, '_row_index': row_index, '_col_index': index},
-                doc_uuid=doc_uuid,
-                parent_id=ele_id,
-                publish_url=publish_url,
-            ))
-        else:
-            cell_html.append(render_node(child, doc_uuid=doc_uuid, parent_id=ele_id, publish_url=publish_url))
+        cell_html.append(render_table_cell(
+            {
+                **child,
+                '_row_index': row_index,
+                '_col_index': index,
+                'alternate_highlight': alternate_highlight,
+                'alternate_highlight_color': alternate_highlight_color,
+            },
+            doc_uuid=doc_uuid,
+            parent_id=ele_id,
+            publish_url=publish_url,
+        ))
 
     children_html = indent_html(''.join(cell_html))
 
     html = f"""
-    <div hidden="" data-id="{ele_id}"></div>
     {children_html}
     """
 
@@ -394,25 +1103,55 @@ def render_table(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
     """
     sdoc:
     {
-        "id": "J8Kc6OPLTP-tXKdF0XbVPg",
+        "id": "bRvXHPd0S0mlEfpyVBFaRg",
         "type": "table",
         "children": [],
         "columns": [
             {
-                "width": 279
+                "width": 209
             },
             {
-                "width": 279
+                "width": 209
             },
             {
-                "width": 279
+                "width": 209
+            },
+            {
+                "width": 209
+            }
+        ],
+        "ui": {
+            "alternate_highlight": true,
+            "alternate_highlight_color": "sdoc-table-header-2367f2"
+        },
+        "style": {
+            "gridTemplateColumns": "repeat(4, 209px)",
+            "gridAutoRows": "minmax(42px, auto)"
+        }
+    },
+    {
+        "id": "dTwbHxbyTee7PdKoD64o6A",
+        "type": "table",
+        "children": [],
+        "columns": [
+            {
+                "width": 209
+            },
+            {
+                "width": 209
+            },
+            {
+                "width": 209
+            },
+            {
+                "width": 209
             }
         ],
         "ui": {
             "alternate_highlight": false
         },
         "style": {
-            "gridTemplateColumns": "repeat(3, 279px)",
+            "gridTemplateColumns": "repeat(4, 209px)",
             "gridAutoRows": "minmax(42px, auto)"
         }
     },
@@ -420,17 +1159,28 @@ def render_table(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
     html:
     <div
         data-slate-node="element"
-        class="sdoc-table-wrapper position-relative sdoc-drag-cover scroll"
+        class="sdoc-table-wrapper position-relative sdoc-drag-cover"
         data-root="true"
-        style="max-width: 837px;"
+        style="max-width: 839px;"
     >
         <div class="sdoc-table-scroll-wrapper scroll-at-left">
             <div
                 class="sdoc-table-container sdoc-drag-cover"
-                data-id="J8Kc6OPLTP-tXKdF0XbVPg"
-                style="grid-template-columns: 279px 279px 279px;
-                       grid-auto-rows: minmax(44px, auto) minmax(124px, auto);"
-            >
+                data-id="bRvXHPd0S0mlEfpyVBFaRg"
+                style="grid-template-columns: 209px 209px 209px 209px; grid-auto-rows: minmax(43px, auto) minmax(42px, auto) minmax(42px, auto) minmax(42px, auto);">
+            </div>
+        </div>
+    </div>
+    <div
+        data-slate-node="element"
+        class="sdoc-table-wrapper position-relative sdoc-drag-cover"
+        data-root="true"
+        style="max-width: 839px;">
+        <div class="sdoc-table-scroll-wrapper scroll-at-left">
+            <div
+                class="sdoc-table-container sdoc-drag-cover"
+                data-id="dTwbHxbyTee7PdKoD64o6A"
+                style="grid-template-columns: 209px 209px 209px 209px; grid-auto-rows: minmax(82px, auto) minmax(124px, auto) minmax(42px, auto);">
             </div>
         </div>
     </div>
@@ -458,22 +1208,27 @@ def render_table(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
     )
 
     row_html = []
+    alternate_highlight = sdoc_json.get('ui', {}).get('alternate_highlight', False)
+    alternate_highlight_color = sdoc_json.get('ui', {}).get('alternate_highlight_color', '')
     for index, child in enumerate(sdoc_json.get('children', []), start=1):
-        if child.get('type') == 'table_row':
-            row_html.append(render_table_row(
-                {**child, '_row_index': index},
-                doc_uuid=doc_uuid,
-                parent_id=ele_id,
-            ))
-        else:
-            row_html.append(render_node(child, doc_uuid=doc_uuid, parent_id=ele_id, publish_url=publish_url))
+        row_html.append(render_table_row(
+            {
+                **child,
+                '_row_index': index,
+                'alternate_highlight': alternate_highlight,
+                'alternate_highlight_color': alternate_highlight_color,
+            },
+            doc_uuid=doc_uuid,
+            parent_id=ele_id,
+            publish_url=publish_url,
+        ))
 
     children_html = indent_html(''.join(row_html))
 
     html = f"""
     <div
         data-slate-node="element"
-        class="sdoc-table-wrapper position-relative sdoc-drag-cover scroll"
+        class="sdoc-table-wrapper position-relative sdoc-drag-cover"
         data-root="true"
         style="{wrapper_style}"
     >
@@ -1733,6 +2488,76 @@ def render_wiki_link(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
     return html
 
 
+def render_image_block(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
+    """
+    sdoc:
+    {
+        "id": "bei2BfIVTomRkMQ-_cBOrA",
+        "type": "image_block",
+        "children": [],
+        "align": "left"
+    },
+    {
+        "id": "RHfns1WfTkqLANFIZFsLnQ",
+        "type": "image_block",
+        "children": [],
+        "align": "center"
+    },
+    {
+        "id": "OE0pGj5PQISzkH0qPNbv9g",
+        "type": "image_block",
+        "children": [],
+        "align": "right"
+    },
+
+    html:
+    <div
+        class="sdoc-drag-cover"
+        data-slate-node="element"
+        data-root="true"
+        contenteditable="true"
+        style="display: flex; justify-content: start;"
+    >
+    </div>
+    <div
+        class="sdoc-drag-cover"
+        data-slate-node="element"
+        data-root="true"
+        contenteditable="true"
+        style="display: flex; justify-content: center;">
+    </div>
+    <div
+        class="sdoc-drag-cover"
+        data-slate-node="element"
+        data-root="true"
+        contenteditable="true"
+        style="display: flex; justify-content: end;">
+    </div>
+    """
+
+    ele_id = escape_html(sdoc_json['id'])
+    align = sdoc_json['align']
+
+    children_html = indent_html("".join(
+        render_node(child, doc_uuid=doc_uuid, parent_id=ele_id, publish_url=publish_url)
+        for child in sdoc_json.get('children', [])
+    ))
+
+    html = f"""
+    <div
+        class="sdoc-drag-cover"
+        data-slate-node="element"
+        data-root="true"
+        contenteditable="true"
+        style="display: flex; justify-content: {align};"
+    >
+        {children_html}
+    </div>
+    """
+
+    return html
+
+
 def render_image(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
     """
     {
@@ -1783,32 +2608,256 @@ def render_text(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
     """
     sdoc:
     {
-        "id": "GRUSC3auSAihSO7DE0iIKQ",
-        "text": "text"
+        "id": "eJ2YlEnHTgeJ0nf2QcJwrg",
+        "text": "highlight_color",
+        "highlight_color": "#FF0000"
+    },
+    {
+        "id": "JrDwhkwaS7KKYSZ-h5noPw",
+        "text": "，"
+    },
+    {
+        "id": "ZDCgNP2aSuamMUtePcOexw",
+        "text": "color",
+        "color": "#FFFF00"
+    },
+    {
+        "id": "L7jIYpqcRgKSS8rDf8wsCQ",
+        "text": "，"
+    },
+    {
+        "id": "JwdYattGRE-p_GarjjMH4A",
+        "text": "bold",
+        "bold": true
+    },
+    {
+        "id": "D9J1loe1RCitfgh5y8UZHQ",
+        "text": "，"
+    },
+    {
+        "id": "BlFZONNZSqqt9oh-g0O8fQ",
+        "text": "underline",
+        "underline": true
+    },
+    {
+        "id": "DttNMN8SQpG7XIDneYvF3Q",
+        "text": "，"
+    },
+    {
+        "id": "GyO5nvy7SZaA1RzwcFYJYw",
+        "text": "italic",
+        "italic": true
+    },
+    {
+        "id": "Z_L-01b9QteRCjmugyyg4Q",
+        "text": "，"
+    },
+    {
+        "id": "O8McLqioQA6t7YRqZ_Zo4Q",
+        "text": "font_size",
+        "font_size": 13
+    },
+    {
+        "id": "Ka_iY35jT2iyE2waV--0Fg",
+        "text": "，"
+    },
+    {
+        "id": "X-XbbntHQ0u1Ejcggw4W8w",
+        "text": "sub",
+        "superscript": true
+    },
+    {
+        "id": "GryZbPyoQ6SPbeVnGzMikw",
+        "text": "，"
+    },
+    {
+        "id": "KhF8PpP5T-qTZE2dKPYLEw",
+        "text": "sup",
+        "subscript": true
     }
 
     html:
     <span data-slate-node="text">
-       <span
-           data-id="GRUSC3auSAihSO7DE0iIKQ"
-           data-slate-leaf="true"
-           class="id"
-        >
-          <span data-slate-string="true">text</span>
-       </span>
+        <span data-id="eJ2YlEnHTgeJ0nf2QcJwrg" data-slate-leaf="true" class="id highlight_color"
+        style="background-color: rgb(255, 0, 0);">
+            <span data-slate-string="true">
+                highlight_color
+            </span>
+        </span>
+    </span>
+    <span data-slate-node="text">
+        <span data-id="JrDwhkwaS7KKYSZ-h5noPw" data-slate-leaf="true" class="id">
+            <span data-slate-string="true">
+                ，
+            </span>
+        </span>
+    </span>
+    <span data-slate-node="text">
+        <span data-id="ZDCgNP2aSuamMUtePcOexw" data-slate-leaf="true" class="id color"
+        style="color: rgb(255, 255, 0);">
+            <span data-slate-string="true">
+                color
+            </span>
+        </span>
+    </span>
+    <span data-slate-node="text">
+        <span data-id="L7jIYpqcRgKSS8rDf8wsCQ" data-slate-leaf="true" class="id">
+            <span data-slate-string="true">
+                ，
+            </span>
+        </span>
+    </span>
+    <span data-slate-node="text">
+        <span data-id="JwdYattGRE-p_GarjjMH4A" data-slate-leaf="true" class="id bold">
+            <strong>
+                <span data-slate-string="true">
+                    bold
+                </span>
+            </strong>
+        </span>
+    </span>
+    <span data-slate-node="text">
+        <span data-id="D9J1loe1RCitfgh5y8UZHQ" data-slate-leaf="true" class="id">
+            <span data-slate-string="true">
+                ，
+            </span>
+        </span>
+    </span>
+    <span data-slate-node="text">
+        <span data-id="BlFZONNZSqqt9oh-g0O8fQ" data-slate-leaf="true" class="id underline">
+            <span style="text-decoration: underline;">
+                <span data-slate-string="true">
+                    underline
+                </span>
+            </span>
+        </span>
+    </span>
+    <span data-slate-node="text">
+        <span data-id="DttNMN8SQpG7XIDneYvF3Q" data-slate-leaf="true" class="id">
+            <span data-slate-string="true">
+                ，
+            </span>
+        </span>
+    </span>
+    <span data-slate-node="text">
+        <span data-id="GyO5nvy7SZaA1RzwcFYJYw" data-slate-leaf="true" class="id italic">
+            <i>
+                <span data-slate-string="true">
+                    italic
+                </span>
+            </i>
+        </span>
+    </span>
+    <span data-slate-node="text">
+        <span data-id="Z_L-01b9QteRCjmugyyg4Q" data-slate-leaf="true" class="id">
+            <span data-slate-string="true">
+                ，
+            </span>
+        </span>
+    </span>
+    <span data-slate-node="text">
+        <span data-id="O8McLqioQA6t7YRqZ_Zo4Q" data-slate-leaf="true" class="id font_size"
+        style="font-size: 13pt;">
+            <span data-slate-string="true">
+                font_size
+            </span>
+        </span>
+    </span>
+    <span data-slate-node="text">
+        <span data-id="Ka_iY35jT2iyE2waV--0Fg" data-slate-leaf="true" class="id">
+            <span data-slate-string="true">
+                ，
+            </span>
+        </span>
+    </span>
+    <span data-slate-node="text">
+        <span data-id="X-XbbntHQ0u1Ejcggw4W8w" data-slate-leaf="true" class="id superscript">
+            <sup>
+                <span data-slate-string="true">
+                    sub
+                </span>
+            </sup>
+        </span>
+    </span>
+    <span data-slate-node="text">
+        <span data-id="GryZbPyoQ6SPbeVnGzMikw" data-slate-leaf="true" class="id">
+            <span data-slate-string="true">
+                ，
+            </span>
+        </span>
+    </span>
+    <span data-slate-node="text">
+        <span data-id="KhF8PpP5T-qTZE2dKPYLEw" data-slate-leaf="true" class="id subscript">
+            <sub>
+                <span data-slate-string="true">
+                    sup
+                </span>
+            </sub>
+        </span>
     </span>
     """
 
     ele_id = escape_html(sdoc_json['id'])
     text = escape_html(sdoc_json['text'])
 
+    class_names = ['id']
+    style_parts = []
+
+    if 'highlight_color' in sdoc_json:
+        class_names.append('highlight_color')
+        style_parts.append(f'background-color: {escape_html(sdoc_json["highlight_color"])};')
+
+    if 'color' in sdoc_json:
+        class_names.append('color')
+        style_parts.append(f'color: {escape_html(sdoc_json["color"])};')
+
+    if sdoc_json.get('bold'):
+        class_names.append('bold')
+
+    if sdoc_json.get('underline'):
+        class_names.append('underline')
+
+    if sdoc_json.get('italic'):
+        class_names.append('italic')
+
+    if 'font_size' in sdoc_json:
+        class_names.append('font_size')
+        style_parts.append(f'font-size: {escape_html(sdoc_json["font_size"])}pt;')
+
+    if sdoc_json.get('superscript'):
+        class_names.append('superscript')
+
+    if sdoc_json.get('subscript'):
+        class_names.append('subscript')
+
+    class_attr = ' '.join(class_names)
+    style_attr = ''
+    if style_parts:
+        style_attr = f' style="{" ".join(style_parts)}"'
+
+    text_html = f'<span data-slate-string="true">{text}</span>'
+    if text == '':
+        text_html = '<span data-slate-zero-width="z" data-slate-length="0"></span>'
+
+    if sdoc_json.get('bold'):
+        text_html = f'<strong>{text_html}</strong>'
+
+    if sdoc_json.get('underline'):
+        text_html = f'<span style="text-decoration: underline;">{text_html}</span>'
+
+    if sdoc_json.get('italic'):
+        text_html = f'<i>{text_html}</i>'
+
+    if sdoc_json.get('superscript'):
+        text_html = f'<sup>{text_html}</sup>'
+
+    if sdoc_json.get('subscript'):
+        text_html = f'<sub>{text_html}</sub>'
+
     html = f"""
     <span data-slate-node="text">
-        <span data-id="{ele_id}"
-            data-slate-leaf="true"
-            class="id"
-        >
-            <span data-slate-string="true">{text}</span>
+        <span data-id="{ele_id}" data-slate-leaf="true" class="{class_attr}"{style_attr}>
+            {text_html}
         </span>
     </span>
     """
@@ -1841,6 +2890,9 @@ def render_node(node, doc_uuid='', parent_id='', publish_url=''):
 
     if node_type == 'wiki_link':
         return render_wiki_link(node, doc_uuid=doc_uuid, parent_id=parent_id, publish_url=publish_url)
+
+    if node_type == 'image_block':
+        return render_image_block(node, doc_uuid=doc_uuid, parent_id=parent_id, publish_url=publish_url)
 
     if node_type == 'image':
         return render_image(node, doc_uuid=doc_uuid, parent_id=parent_id, publish_url=publish_url)
