@@ -324,6 +324,17 @@ class TestSdocToHtml(unittest.TestCase):
         self.assertNotIn('font-size:', html)
         self.assertIn('data-slate-zero-width="z" data-slate-length="0"', html)
 
+    def test_render_text_with_strikethrough(self):
+        html = html_converter.render_text({
+            'id': 'strikethrough-text-id',
+            'text': '123',
+            'strikethrough': True,
+        })
+
+        self.assertIn('class="id strikethrough"', html)
+        self.assertIn('text-decoration: line-through;', html)
+        self.assertIn('123', html)
+
     @patch('seadoc_converter.converter.html_converter.trans_img_path_to_url', return_value='https://example.com/image.png')
     def test_render_node_and_sdoc2html(self, mock_trans_img_path_to_url):
         image_block = self.get_node_by_id('WChrKqM-QteLLjB6jxkdYg')

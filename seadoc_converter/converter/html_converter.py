@@ -2675,6 +2675,11 @@ def render_text(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
         "text": "sup",
         "subscript": true
     }
+    {
+        "text": "123",
+        "id": "evkIEkRYT3KHDX4VamX3ow",
+        "strikethrough": true
+    }
 
     html:
     <span data-slate-node="text">
@@ -2795,6 +2800,15 @@ def render_text(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
             </sub>
         </span>
     </span>
+    <span data-slate-node="text">
+        <span data-id="evkIEkRYT3KHDX4VamX3ow" data-slate-leaf="true" class="id strikethrough">
+            <span style="text-decoration: line-through;">
+                <span data-slate-string="true">
+                    123
+                </span>
+            </span>
+        </span>
+    </span>
     """
 
     ele_id = escape_html(sdoc_json['id'])
@@ -2819,6 +2833,9 @@ def render_text(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
 
     if sdoc_json.get('italic'):
         class_names.append('italic')
+
+    if sdoc_json.get('strikethrough'):
+        class_names.append('strikethrough')
 
     if 'font_size' in sdoc_json:
         class_names.append('font_size')
@@ -2847,6 +2864,9 @@ def render_text(sdoc_json, doc_uuid='', parent_id='', publish_url=''):
 
     if sdoc_json.get('italic'):
         text_html = f'<i>{text_html}</i>'
+
+    if sdoc_json.get('strikethrough'):
+        text_html = f'<span style="text-decoration: line-through;">{text_html}</span>'
 
     if sdoc_json.get('superscript'):
         text_html = f'<sup>{text_html}</sup>'
