@@ -77,10 +77,40 @@ class TestSdocToHtml(unittest.TestCase):
         self.assertIn('display: none;', combined_html)
         self.assertIn('data-slate-zero-width="n"', combined_html)
 
+    def test_render_table_cell_style_and_inherit_style(self):
+        align_html = html_converter.render_table_cell({
+            'id': 'align-cell-id',
+            'type': 'table_cell',
+            'children': [{'id': 'align-text-id', 'text': '6'}],
+            'style': {'align_items': 'center'},
+            'inherit_style': {},
+            '_row_index': 2,
+            '_col_index': 2,
+        })
+        inherit_html = html_converter.render_table_cell({
+            'id': 'inherit-cell-id',
+            'type': 'table_cell',
+            'children': [{'id': 'inherit-text-id', 'text': 'a'}],
+            'style': {},
+            'inherit_style': {
+                'background_color': '#914545',
+                'text_align': 'right',
+                'align_items': 'flex-end',
+            },
+            '_row_index': 3,
+            '_col_index': 1,
+        })
+
+        self.assertIn('align-items: center;', align_html)
+        self.assertIn('background-color: #914545;', inherit_html)
+        self.assertIn('text-align: right;', inherit_html)
+        self.assertIn('align-items: flex-end;', inherit_html)
+
     def test_render_table_row(self):
         html = html_converter.render_table_row({**self.get_node_by_id('fMnaCyEBQgWp7ZqK-tVkZw'), '_row_index': 1})
 
-        self.assertIn('hidden="" data-id="fMnaCyEBQgWp7ZqK-tVkZw"', html)
+        self.assertNotIn('hidden="" data-id="fMnaCyEBQgWp7ZqK-tVkZw"', html)
+        self.assertIn('grid-area: 1 / 1 / span 1 / span 2;', html)
         self.assertIn('data-id="I6-Xd9rpRLCMFr5jB3rECA"', html)
         self.assertIn('data-id="GWu9Z5MmTs6ACBTTqIOorA"', html)
 
@@ -260,18 +290,68 @@ class TestSdocToHtml(unittest.TestCase):
         self.assertIn('data-id="dncBr5o8RwiAaqd4uwfL1A"', html)
         self.assertIn('Heading 1', html)
 
-    def test_render_node_and_sdoc2html(self):
+    def test_render_text_with_styles(self):
+        html = html_converter.render_text({
+            'id': 'text-style-id',
+            'text': 'styled text',
+            'highlight_color': '#FF0000',
+            'color': '#FFFF00',
+            'bold': True,
+            'underline': True,
+            'italic': True,
+            'font_size': 13,
+            'superscript': True,
+        })
+
+        self.assertIn('class="id highlight_color color bold underline italic font_size superscript"', html)
+        self.assertIn('background-color: #FF0000;', html)
+        self.assertIn('color: #FFFF00;', html)
+        self.assertIn('font-size: 13pt;', html)
+        self.assertIn('<strong>', html)
+        self.assertIn('text-decoration: underline;', html)
+        self.assertIn('<i>', html)
+        self.assertIn('<sup>', html)
+        self.assertIn('styled text', html)
+
+    def test_render_text_with_missing_optional_fields_and_empty_text(self):
+        html = html_converter.render_text({
+            'id': 'empty-text-id',
+            'text': '',
+        })
+
+        self.assertIn('class="id"', html)
+        self.assertNotIn('highlight_color', html)
+        self.assertNotIn('font-size:', html)
+        self.assertIn('data-slate-zero-width="z" data-slate-length="0"', html)
+
+    @patch('seadoc_converter.converter.html_converter.trans_img_path_to_url', return_value='https://example.com/image.png')
+    def test_render_node_and_sdoc2html(self, mock_trans_img_path_to_url):
+        image_block = self.get_node_by_id('WChrKqM-QteLLjB6jxkdYg')
+        image_block['align'] = 'center'
+
+        fixture = deepcopy(self.fixture)
+        fixture_image_block = self._find_node(
+            lambda current: current.get('id') == 'WChrKqM-QteLLjB6jxkdYg',
+            fixture['elements'],
+        )
+        self.assertIsNotNone(fixture_image_block)
+        fixture_image_block['align'] = 'center'
+
         image_block_html = html_converter.render_node(
-            self.get_node_by_id('WChrKqM-QteLLjB6jxkdYg'),
+            image_block,
             doc_uuid=DOC_UUID,
             parent_id='root',
         )
-        html = html_converter.sdoc2html(self.fixture)
+        html = html_converter.sdoc2html(fixture, doc_uuid=DOC_UUID)
 
+        self.assertIn('justify-content: center;', image_block_html)
         self.assertIn('class="sdoc-image-wrapper"', image_block_html)
+        self.assertIn('src="https://example.com/image.png"', image_block_html)
         self.assertIn('class="sdoc-header-1"', html)
         self.assertIn('class="sdoc-code-block-container sdoc-drag-cover"', html)
         self.assertIn('class="sdoc-callout-white-wrapper"', html)
+        self.assertIn('justify-content: center;', html)
+        self.assertGreaterEqual(mock_trans_img_path_to_url.call_count, 2)
 
 
 if __name__ == '__main__':
