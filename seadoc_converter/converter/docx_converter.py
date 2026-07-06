@@ -54,6 +54,12 @@ def sdoc2docx(file_content_json, file_uuid, username):
         :return: The hyperlink object
         """
 
+        display_text = text or url or ''
+        if not url:
+            if display_text:
+                paragraph.add_run(display_text)
+            return None
+
         # This gets access to the document.xml.rels file and gets a new relation id value
         part = paragraph.part
         r_id = part.relate_to(url, docx.opc.constants.RELATIONSHIP_TYPE.HYPERLINK, is_external=True)
@@ -76,7 +82,7 @@ def sdoc2docx(file_content_json, file_uuid, username):
 
         # Join all the xml elements together add add the required text to the w:r element
         new_run.append(rPr)
-        new_run.text = text
+        new_run.text = display_text
         hyperlink.append(new_run)
 
         paragraph._p.append(hyperlink)
@@ -199,6 +205,9 @@ def sdoc2docx(file_content_json, file_uuid, username):
                     link_href = item['href']
                 if 'title' in item:
                     link_title = item['title']
+
+            if not link_title:
+                link_title = link_href
 
             docx_paragraph = document.add_paragraph()
             add_hyperlink(docx_paragraph, link_href, link_title, "0000FF")
