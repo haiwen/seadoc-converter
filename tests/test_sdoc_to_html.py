@@ -255,6 +255,14 @@ class TestSdocToHtml(unittest.TestCase):
         self.assertIn('fixture.sdoc', html)
 
     def test_render_wiki_link(self):
+        wiki_config = {
+            'pages': [
+                {
+                    'id': 'page-id',
+                    'name': 'Configured Wiki page',
+                },
+            ],
+        }
         html = html_converter.render_wiki_link({
             'id': 'wiki-link-id',
             'type': 'wiki_link',
@@ -265,11 +273,46 @@ class TestSdocToHtml(unittest.TestCase):
             'isDir': False,
             'display_type': 'icon_link',
             'children': [],
-        }, publish_url=PUBLISH_URL)
+        }, publish_url=PUBLISH_URL, wiki_config=wiki_config)
 
         self.assertIn('data-id="wiki-link-id"', html)
         self.assertIn('/wiki/publish/published-page/page-id/', html)
-        self.assertIn('Wiki page', html)
+        self.assertIn('Configured Wiki page', html)
+
+    def test_render_blockquote_passes_wiki_config_to_nested_renderers(self):
+        blockquote = {
+            'id': 'blockquote-id',
+            'type': 'blockquote',
+            'children': [
+                {
+                    'id': 'wiki-link-id',
+                    'type': 'wiki_link',
+                    'wiki_repo_id': 'repo-id',
+                    'page_id': 'page-id',
+                    'title': 'Fallback Wiki page',
+                    'icon': '',
+                    'isDir': False,
+                    'display_type': 'icon_link',
+                    'children': [],
+                },
+            ],
+        }
+        wiki_config = {
+            'pages': [
+                {
+                    'id': 'page-id',
+                    'name': 'Nested Configured Wiki page',
+                },
+            ],
+        }
+
+        html = html_converter.render_blockquote(
+            blockquote,
+            publish_url=PUBLISH_URL,
+            wiki_config=wiki_config,
+        )
+
+        self.assertIn('Nested Configured Wiki page', html)
 
     @patch('seadoc_converter.converter.html_converter.trans_img_path_to_url', return_value='https://example.com/image.png')
     def test_render_image(self, mock_trans_img_path_to_url):
@@ -334,6 +377,34 @@ class TestSdocToHtml(unittest.TestCase):
         self.assertIn('class="id strikethrough"', html)
         self.assertIn('text-decoration: line-through;', html)
         self.assertIn('123', html)
+
+    def test_render_node_passes_wiki_config_to_wiki_link(self):
+        wiki_config = {
+            'pages': [
+                {
+                    'id': 'page-id',
+                    'name': 'Render Node Wiki page',
+                },
+            ],
+        }
+
+        html = html_converter.render_node(
+            {
+                'id': 'wiki-link-id',
+                'type': 'wiki_link',
+                'wiki_repo_id': 'repo-id',
+                'page_id': 'page-id',
+                'title': 'Fallback Wiki page',
+                'icon': '',
+                'isDir': False,
+                'display_type': 'icon_link',
+                'children': [],
+            },
+            publish_url=PUBLISH_URL,
+            wiki_config=wiki_config,
+        )
+
+        self.assertIn('Render Node Wiki page', html)
 
     @patch('seadoc_converter.converter.html_converter.trans_img_path_to_url', return_value='https://example.com/image.png')
     def test_render_node_and_sdoc2html(self, mock_trans_img_path_to_url):
