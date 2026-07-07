@@ -316,8 +316,11 @@ class TestSdocToHtml(unittest.TestCase):
 
     @patch('seadoc_converter.converter.html_converter.trans_img_path_to_url', return_value='https://example.com/image.png')
     def test_render_image(self, mock_trans_img_path_to_url):
+        image_node = self.get_node_by_id('fV-_QGi4RwOmWiWNzsCLRQ')
+        image_node['data']['width'] = 481
+
         html = html_converter.render_image(
-            self.get_node_by_id('fV-_QGi4RwOmWiWNzsCLRQ'),
+            image_node,
             doc_uuid=DOC_UUID,
             parent_id='image-block-id',
         )
@@ -325,6 +328,7 @@ class TestSdocToHtml(unittest.TestCase):
         self.assertIn('data-id="fV-_QGi4RwOmWiWNzsCLRQ"', html)
         self.assertIn('data-parent-id="image-block-id"', html)
         self.assertIn('src="https://example.com/image.png"', html)
+        self.assertIn('style="width: 481px;"', html)
         mock_trans_img_path_to_url.assert_called_once_with('/image-J10ano3ZQV6R0cbAehCKKw.png', DOC_UUID)
 
     def test_render_text(self):
@@ -410,6 +414,7 @@ class TestSdocToHtml(unittest.TestCase):
     def test_render_node_and_sdoc2html(self, mock_trans_img_path_to_url):
         image_block = self.get_node_by_id('WChrKqM-QteLLjB6jxkdYg')
         image_block['align'] = 'center'
+        image_block['children'][1]['data']['width'] = 481
 
         fixture = deepcopy(self.fixture)
         fixture_image_block = self._find_node(
@@ -418,6 +423,7 @@ class TestSdocToHtml(unittest.TestCase):
         )
         self.assertIsNotNone(fixture_image_block)
         fixture_image_block['align'] = 'center'
+        fixture_image_block['children'][1]['data']['width'] = 481
 
         image_block_html = html_converter.render_node(
             image_block,
