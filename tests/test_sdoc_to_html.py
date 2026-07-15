@@ -255,13 +255,8 @@ class TestSdocToHtml(unittest.TestCase):
         self.assertIn('fixture.sdoc', html)
 
     def test_render_wiki_link(self):
-        wiki_config = {
-            'pages': [
-                {
-                    'id': 'page-id',
-                    'name': 'Configured Wiki page',
-                },
-            ],
+        page_id_name_dict = {
+            'page-id': 'Configured Wiki page',
         }
         html = html_converter.render_wiki_link({
             'id': 'wiki-link-id',
@@ -273,13 +268,13 @@ class TestSdocToHtml(unittest.TestCase):
             'isDir': False,
             'display_type': 'icon_link',
             'children': [],
-        }, publish_url=PUBLISH_URL, wiki_config=wiki_config)
+        }, publish_url=PUBLISH_URL, page_id_name_dict=page_id_name_dict)
 
         self.assertIn('data-id="wiki-link-id"', html)
         self.assertIn('/wiki/publish/published-page/page-id/', html)
         self.assertIn('Configured Wiki page', html)
 
-    def test_render_blockquote_passes_wiki_config_to_nested_renderers(self):
+    def test_render_blockquote_passes_page_id_name_dict_to_nested_renderers(self):
         blockquote = {
             'id': 'blockquote-id',
             'type': 'blockquote',
@@ -297,19 +292,14 @@ class TestSdocToHtml(unittest.TestCase):
                 },
             ],
         }
-        wiki_config = {
-            'pages': [
-                {
-                    'id': 'page-id',
-                    'name': 'Nested Configured Wiki page',
-                },
-            ],
+        page_id_name_dict = {
+            'page-id': 'Nested Configured Wiki page',
         }
 
         html = html_converter.render_blockquote(
             blockquote,
             publish_url=PUBLISH_URL,
-            wiki_config=wiki_config,
+            page_id_name_dict=page_id_name_dict,
         )
 
         self.assertIn('Nested Configured Wiki page', html)
@@ -382,14 +372,9 @@ class TestSdocToHtml(unittest.TestCase):
         self.assertIn('text-decoration: line-through;', html)
         self.assertIn('123', html)
 
-    def test_render_node_passes_wiki_config_to_wiki_link(self):
-        wiki_config = {
-            'pages': [
-                {
-                    'id': 'page-id',
-                    'name': 'Render Node Wiki page',
-                },
-            ],
+    def test_render_node_passes_page_id_name_dict_to_wiki_link(self):
+        page_id_name_dict = {
+            'page-id': 'Render Node Wiki page',
         }
 
         html = html_converter.render_node(
@@ -405,7 +390,7 @@ class TestSdocToHtml(unittest.TestCase):
                 'children': [],
             },
             publish_url=PUBLISH_URL,
-            wiki_config=wiki_config,
+            page_id_name_dict=page_id_name_dict,
         )
 
         self.assertIn('Render Node Wiki page', html)

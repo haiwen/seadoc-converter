@@ -301,7 +301,7 @@ def sdoc_export_to_html():
     dst_type = data.get('dst_type')
     download_url = data.get('download_url')
     publish_url = data.get('publish_url')
-    wiki_config = data.get('wiki_config')
+    page_id_name_dict = data.get('page_id_name_dict')
 
     extension = Path(path).suffix
     if extension not in ['.sdoc']:
@@ -320,7 +320,7 @@ def sdoc_export_to_html():
     html_body = sdoc2html(sdoc_content,
                           doc_uuid=doc_uuid,
                           publish_url=publish_url,
-                          wiki_config=wiki_config)
+                          page_id_name_dict=page_id_name_dict)
 
     filename = os.path.basename(path)
     new_filename = quote(filename[:-5] + '.html')

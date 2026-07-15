@@ -174,7 +174,7 @@ def formula_to_svg(formula):
 
 
 # render function
-def render_blockquote(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_blockquote(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -197,7 +197,7 @@ def render_blockquote(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki
 
     children_html = indent_html("".join(
         render_node(child, doc_uuid=doc_uuid, parent_id=ele_id, publish_url=publish_url,
-                    wiki_config=wiki_config)
+                    page_id_name_dict=page_id_name_dict)
         for child in sdoc_json.get('children', [])
     ))
 
@@ -215,7 +215,7 @@ def render_blockquote(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki
     return html
 
 
-def render_table_cell(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_table_cell(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -1011,7 +1011,7 @@ def render_table_cell(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki
     else:
         children_html = indent_html(''.join(
             render_node(child, doc_uuid=doc_uuid, parent_id=ele_id, publish_url=publish_url,
-                        wiki_config=wiki_config)
+                        page_id_name_dict=page_id_name_dict)
             for child in sdoc_json.get('children', [])
         ))
 
@@ -1034,7 +1034,7 @@ def render_table_cell(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki
     return html
 
 
-def render_table_row(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_table_row(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -1090,7 +1090,7 @@ def render_table_row(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_
             doc_uuid=doc_uuid,
             parent_id=ele_id,
             publish_url=publish_url,
-            wiki_config=wiki_config,
+            page_id_name_dict=page_id_name_dict,
         ))
 
     children_html = indent_html(''.join(cell_html))
@@ -1102,7 +1102,7 @@ def render_table_row(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_
     return html
 
 
-def render_table(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_table(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -1224,7 +1224,7 @@ def render_table(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_conf
             doc_uuid=doc_uuid,
             parent_id=ele_id,
             publish_url=publish_url,
-            wiki_config=wiki_config,
+            page_id_name_dict=page_id_name_dict,
         ))
 
     children_html = indent_html(''.join(row_html))
@@ -1251,7 +1251,7 @@ def render_table(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_conf
     return html
 
 
-def render_column(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_column(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -1278,7 +1278,7 @@ def render_column(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_con
 
     children_html = indent_html("".join(
         render_node(child, doc_uuid=doc_uuid, parent_id=ele_id, publish_url=publish_url,
-                    wiki_config=wiki_config)
+                    page_id_name_dict=page_id_name_dict)
         for child in sdoc_json.get('children', [])
     ))
 
@@ -1298,7 +1298,7 @@ def render_column(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_con
     return html
 
 
-def render_multi_column(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_multi_column(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -1341,7 +1341,7 @@ def render_multi_column(sdoc_json, doc_uuid='', parent_id='', publish_url='', wi
 
     children_html = indent_html("".join(
         render_node(child, doc_uuid=doc_uuid, parent_id=ele_id, publish_url=publish_url,
-                    wiki_config=wiki_config)
+                    page_id_name_dict=page_id_name_dict)
         for child in sdoc_json.get('children', [])
     ))
 
@@ -1365,7 +1365,7 @@ def render_multi_column(sdoc_json, doc_uuid='', parent_id='', publish_url='', wi
     return html
 
 
-def render_formula(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_formula(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -1421,7 +1421,7 @@ def render_formula(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_co
     return html
 
 
-def render_callout(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_callout(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -1455,7 +1455,7 @@ def render_callout(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_co
 
     children_html = indent_html("".join(
         render_node(child, doc_uuid=doc_uuid, parent_id=ele_id, publish_url=publish_url,
-                    wiki_config=wiki_config)
+                    page_id_name_dict=page_id_name_dict)
         for child in sdoc_json.get('children', [])
     ))
 
@@ -1479,7 +1479,7 @@ def render_callout(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_co
     return html
 
 
-def render_code_block(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_code_block(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -1521,7 +1521,7 @@ def render_code_block(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki
             else:
                 code_line_html = indent_html("".join(
                     render_node(grandchild, doc_uuid=doc_uuid, parent_id=code_line_id,
-                                publish_url=publish_url, wiki_config=wiki_config)
+                                publish_url=publish_url, page_id_name_dict=page_id_name_dict)
                     for grandchild in child.get('children', [])
                 ))
             if not code_line_html.strip():
@@ -1542,7 +1542,7 @@ def render_code_block(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki
                 doc_uuid=doc_uuid,
                 parent_id=ele_id,
                 publish_url=publish_url,
-                wiki_config=wiki_config,
+                page_id_name_dict=page_id_name_dict,
             ))
 
     children_html = indent_html("".join(rendered_children))
@@ -1565,7 +1565,7 @@ def render_code_block(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki
     return html
 
 
-def render_video(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_video(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -1746,7 +1746,7 @@ def render_video(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_conf
     return html
 
 
-def render_check_list(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_check_list(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -1796,7 +1796,7 @@ def render_check_list(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki
 
     children_html = indent_html("".join(
         render_node(child, doc_uuid=doc_uuid, parent_id=ele_id, publish_url=publish_url,
-                    wiki_config=wiki_config)
+                    page_id_name_dict=page_id_name_dict)
         for child in sdoc_json.get('children', [])
     ))
 
@@ -1824,7 +1824,7 @@ def render_check_list(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki
     return html
 
 
-def render_ordered_list(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_ordered_list(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -1847,7 +1847,7 @@ def render_ordered_list(sdoc_json, doc_uuid='', parent_id='', publish_url='', wi
 
     children_html = indent_html("".join(
         render_node(child, doc_uuid=doc_uuid, parent_id=ele_id, publish_url=publish_url,
-                    wiki_config=wiki_config)
+                    page_id_name_dict=page_id_name_dict)
         for child in sdoc_json.get('children', [])
     ))
 
@@ -1865,7 +1865,7 @@ def render_ordered_list(sdoc_json, doc_uuid='', parent_id='', publish_url='', wi
     return html
 
 
-def render_unordered_list(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_unordered_list(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -1888,7 +1888,7 @@ def render_unordered_list(sdoc_json, doc_uuid='', parent_id='', publish_url='', 
 
     children_html = indent_html("".join(
         render_node(child, doc_uuid=doc_uuid, parent_id=ele_id, publish_url=publish_url,
-                    wiki_config=wiki_config)
+                    page_id_name_dict=page_id_name_dict)
         for child in sdoc_json.get('children', [])
     ))
 
@@ -1906,7 +1906,7 @@ def render_unordered_list(sdoc_json, doc_uuid='', parent_id='', publish_url='', 
     return html
 
 
-def render_list_item(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_list_item(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -1934,7 +1934,7 @@ def render_list_item(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_
 
     children_html = indent_html("".join(
         render_node(child, doc_uuid=doc_uuid, parent_id=ele_id, publish_url=publish_url,
-                    wiki_config=wiki_config)
+                    page_id_name_dict=page_id_name_dict)
         for child in sdoc_json.get('children', [])
     ))
 
@@ -1972,7 +1972,7 @@ def render_list_item(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_
     return html
 
 
-def render_toggle_header(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_toggle_header(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -1997,7 +1997,7 @@ def render_toggle_header(sdoc_json, doc_uuid='', parent_id='', publish_url='', w
 
     children_html = indent_html("".join(
         render_node(child, doc_uuid=doc_uuid, parent_id=ele_id, publish_url=publish_url,
-                    wiki_config=wiki_config)
+                    page_id_name_dict=page_id_name_dict)
         for child in sdoc_json.get('children', [])
     ))
 
@@ -2016,7 +2016,7 @@ def render_toggle_header(sdoc_json, doc_uuid='', parent_id='', publish_url='', w
     return html
 
 
-def render_toggle_header_row(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_toggle_header_row(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -2048,7 +2048,7 @@ def render_toggle_header_row(sdoc_json, doc_uuid='', parent_id='', publish_url='
 
     children_html = indent_html("".join(
         render_node(child, doc_uuid=doc_uuid, parent_id=ele_id, publish_url=publish_url,
-                    wiki_config=wiki_config)
+                    page_id_name_dict=page_id_name_dict)
         for child in sdoc_json.get('children', [])
     ))
 
@@ -2073,7 +2073,7 @@ def render_toggle_header_row(sdoc_json, doc_uuid='', parent_id='', publish_url='
     return html
 
 
-def render_toggle_content(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_toggle_content(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -2097,7 +2097,7 @@ def render_toggle_content(sdoc_json, doc_uuid='', parent_id='', publish_url='', 
 
     children_html = indent_html("".join(
         render_node(child, doc_uuid=doc_uuid, parent_id=ele_id, publish_url=publish_url,
-                    wiki_config=wiki_config)
+                    page_id_name_dict=page_id_name_dict)
         for child in sdoc_json.get('children', [])
     ))
 
@@ -2116,7 +2116,7 @@ def render_toggle_content(sdoc_json, doc_uuid='', parent_id='', publish_url='', 
     return html
 
 
-def render_paragraph(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_paragraph(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -2140,7 +2140,7 @@ def render_paragraph(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_
 
     children_html = indent_html("".join(
         render_node(child, doc_uuid=doc_uuid, parent_id=ele_id, publish_url=publish_url,
-                    wiki_config=wiki_config)
+                    page_id_name_dict=page_id_name_dict)
         for child in sdoc_json.get('children', [])
     ))
 
@@ -2158,7 +2158,7 @@ def render_paragraph(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_
     return html
 
 
-def render_header(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_header(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -2194,7 +2194,7 @@ def render_header(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_con
 
     children_html = indent_html("".join(
         render_node(child, doc_uuid=doc_uuid, parent_id=ele_id, publish_url=publish_url,
-                    wiki_config=wiki_config)
+                    page_id_name_dict=page_id_name_dict)
         for child in sdoc_json.get('children', [])
     ))
 
@@ -2222,7 +2222,7 @@ def render_header(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_con
     return html
 
 
-def render_embed_link(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_embed_link(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -2269,7 +2269,7 @@ def render_embed_link(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki
     return html
 
 
-def render_link(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_link(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -2362,7 +2362,7 @@ def render_link(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_confi
 
     children_html = indent_html("".join(
         render_node(child, doc_uuid=doc_uuid, parent_id=parent_id, publish_url=publish_url,
-                    wiki_config=wiki_config)
+                    page_id_name_dict=page_id_name_dict)
         for child in sdoc_json.get('children', [])
     ))
 
@@ -2407,7 +2407,7 @@ def render_link(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_confi
     return html
 
 
-def render_file_link(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_file_link(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     {
         "id": "U1q38n7sRpmp4SyPt7xdoA",
@@ -2471,7 +2471,7 @@ def render_file_link(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_
 
 def render_wiki_link(sdoc_json,
                      doc_uuid='', parent_id='',
-                     publish_url='', wiki_config={}):
+                     publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -2485,49 +2485,11 @@ def render_wiki_link(sdoc_json,
         "display_type": "icon_link",
         "children": []
     },
-
-    wiki_config:
-    {
-      "version": 1,
-      "navigation": [
-        {
-          "id": "16Y3",
-          "type": "page"
-        },
-        {
-          "id": "PijT",
-          "type": "page"
-        }
-      ],
-      "pages": [
-        {
-          "id": "16Y3",
-          "name": "New page",
-          "path": "/wiki-pages/2a9ae7c1-d9b8-4299-8def-ad571c399d10/New page.sdoc",
-          "icon": "",
-          "docUuid": "2a9ae7c1-d9b8-4299-8def-ad571c399d10",
-          "locked": false
-        },
-        {
-          "id": "PijT",
-          "name": "lian-test-123",
-          "path": "/wiki-pages/f4da9de4-f5b6-456b-8d1c-432b6db0e88d/New page (1).sdoc",
-          "icon": "",
-          "docUuid": "f4da9de4-f5b6-456b-8d1c-432b6db0e88d",
-          "locked": false
-        }
-      ]
-    }
     """
-
-    def get_name_by_page_id(page_id):
-        for page in wiki_config['pages']:
-            if page['id'] == page_id:
-                return page['name']
 
     ele_id = escape_html(sdoc_json['id'])
     page_id = sdoc_json['page_id']
-    title = get_name_by_page_id(page_id)
+    title = page_id_name_dict.get(page_id)
     if not title:
         title = escape_html(sdoc_json['title'])
 
@@ -2556,7 +2518,7 @@ def render_wiki_link(sdoc_json,
     return html
 
 
-def render_image_block(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_image_block(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -2608,7 +2570,7 @@ def render_image_block(sdoc_json, doc_uuid='', parent_id='', publish_url='', wik
 
     children_html = indent_html("".join(
         render_node(child, doc_uuid=doc_uuid, parent_id=ele_id, publish_url=publish_url,
-                    wiki_config=wiki_config)
+                    page_id_name_dict=page_id_name_dict)
         for child in sdoc_json.get('children', [])
     ))
 
@@ -2627,7 +2589,7 @@ def render_image_block(sdoc_json, doc_uuid='', parent_id='', publish_url='', wik
     return html
 
 
-def render_image(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_image(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -2697,7 +2659,7 @@ def render_image(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_conf
     return html
 
 
-def render_text(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_text(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
     """
     sdoc:
     {
@@ -2979,125 +2941,125 @@ def render_text(sdoc_json, doc_uuid='', parent_id='', publish_url='', wiki_confi
 
 
 # recursive
-def render_node(node, doc_uuid='', parent_id='', publish_url='', wiki_config={}):
+def render_node(node, doc_uuid='', parent_id='', publish_url='', page_id_name_dict={}):
 
     if 'text' in node:
         return render_text(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                           publish_url=publish_url, wiki_config=wiki_config)
+                           publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     node_type = node.get('type')
 
     if node_type == 'table':
         return render_table(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                            publish_url=publish_url, wiki_config=wiki_config)
+                            publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'table_row':
         return render_table_row(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                                publish_url=publish_url, wiki_config=wiki_config)
+                                publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'table_cell':
         return render_table_cell(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                                 publish_url=publish_url, wiki_config=wiki_config)
+                                 publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'link':
         return render_link(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                           publish_url=publish_url, wiki_config=wiki_config)
+                           publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'file_link':
         return render_file_link(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                                publish_url=publish_url, wiki_config=wiki_config)
+                                publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'wiki_link':
         return render_wiki_link(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                                publish_url=publish_url, wiki_config=wiki_config)
+                                publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'image_block':
         return render_image_block(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                                  publish_url=publish_url, wiki_config=wiki_config)
+                                  publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'image':
         return render_image(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                            publish_url=publish_url, wiki_config=wiki_config)
+                            publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'column':
         return render_column(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                             publish_url=publish_url, wiki_config=wiki_config)
+                             publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'multi_column':
         return render_multi_column(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                                   publish_url=publish_url, wiki_config=wiki_config)
+                                   publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'callout':
         return render_callout(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                              publish_url=publish_url, wiki_config=wiki_config)
+                              publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'code_block':
         return render_code_block(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                                 publish_url=publish_url, wiki_config=wiki_config)
+                                 publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'video':
         return render_video(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                            publish_url=publish_url, wiki_config=wiki_config)
+                            publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'check_list_item':
         return render_check_list(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                                 publish_url=publish_url, wiki_config=wiki_config)
+                                 publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'ordered_list':
         return render_ordered_list(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                                   publish_url=publish_url, wiki_config=wiki_config)
+                                   publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'unordered_list':
         return render_unordered_list(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                                     publish_url=publish_url, wiki_config=wiki_config)
+                                     publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'list_item':
         return render_list_item(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                                publish_url=publish_url, wiki_config=wiki_config)
+                                publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type in ['header1', 'header2', 'header3', 'header4', 'header5', 'header6']:
         return render_header(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                             publish_url=publish_url, wiki_config=wiki_config)
+                             publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'toggle_header':
         return render_toggle_header(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                                    publish_url=publish_url, wiki_config=wiki_config)
+                                    publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type in ['toggle_header1', 'toggle_header2', 'toggle_header3',
                      'toggle_header4', 'toggle_header5', 'toggle_header6']:
         return render_toggle_header_row(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                                        publish_url=publish_url, wiki_config=wiki_config)
+                                        publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'toggle_content':
         return render_toggle_content(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                                     publish_url=publish_url, wiki_config=wiki_config)
+                                     publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'paragraph':
         return render_paragraph(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                                publish_url=publish_url, wiki_config=wiki_config)
+                                publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'embed_link':
         return render_embed_link(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                                 publish_url=publish_url, wiki_config=wiki_config)
+                                 publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'formula':
         return render_formula(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                              publish_url=publish_url, wiki_config=wiki_config)
+                              publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     if node_type == 'blockquote':
         return render_blockquote(node, doc_uuid=doc_uuid, parent_id=parent_id,
-                                 publish_url=publish_url, wiki_config=wiki_config)
+                                 publish_url=publish_url, page_id_name_dict=page_id_name_dict)
 
     # TODO
     children = node.get('children', [])
     return ''.join(
         render_node(child, doc_uuid=doc_uuid, parent_id=node.get('id', ''),
-                    publish_url=publish_url, wiki_config=wiki_config)
+                    publish_url=publish_url, page_id_name_dict=page_id_name_dict)
         for child in children
     )
 
 
-def sdoc2html(sdoc_str, doc_uuid='', publish_url='', wiki_config={}):
+def sdoc2html(sdoc_str, doc_uuid='', publish_url='', page_id_name_dict={}):
 
     if isinstance(sdoc_str, dict):
         doc = sdoc_str
@@ -3111,6 +3073,6 @@ def sdoc2html(sdoc_str, doc_uuid='', publish_url='', wiki_config={}):
     html = "".join(render_node(element,
                                doc_uuid=doc_uuid,
                                publish_url=publish_url,
-                               wiki_config=wiki_config) for element in elements)
+                               page_id_name_dict=page_id_name_dict) for element in elements)
 
     return html
