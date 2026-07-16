@@ -2628,7 +2628,11 @@ def render_image(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_n
     image_src = sdoc_json['data']['src']
     image_src = escape_html(trans_img_path_to_url(image_src, doc_uuid))
     parent_id = escape_html(parent_id)
-    width = escape_html(sdoc_json['data']['width'])
+    width = sdoc_json['data'].get('width')
+    if width:
+        inline_style = f'width: {width}px;'
+    else:
+        inline_style = ''
 
     html = f"""
     <span
@@ -2648,7 +2652,7 @@ def render_image(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_n
                         src="{image_src}"
                         draggable="false"
                         alt=""
-                        style="width: {width}px;"
+                        style="{inline_style}"
                     >
                 </span>
             </span>
