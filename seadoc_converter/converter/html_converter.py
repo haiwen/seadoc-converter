@@ -2598,7 +2598,8 @@ def render_image(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_n
         "children": [],
         "data": {
             "src": "/image-cLb5zoSWQ4GokEm4BwGrkg.webp",
-            "width": 481
+            "width": 481,
+            "href": "http://127.0.0.1/wikis/d5725557-11b0-4b21-9043-d9ffeaf365ef/e4xJ/",
         }
     }
 
@@ -2614,8 +2615,10 @@ def render_image(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_n
     >
         <span class="sdoc-image-inner">
             <span class="sdoc-image-content">
-                <span style="border-width: medium; border-style: none; border-color: currentcolor; border-image: initial;">
-                    <img class="" src="/api/v2.1/seadoc/download-image/2a9ae7c1-d9b8-4299-8def-ad571c399d10/image-cLb5zoSWQ4GokEm4BwGrkg.webp"
+                <span class="sdoc-image-visual" style="border-width: medium; border-style: none; border-color: currentcolor; border-image: initial;">
+                    <a class="sdoc-image-page-link" href="http://127.0.0.1/wikis/d5725557-11b0-4b21-9043-d9ffeaf365ef/e4xJ/">
+                        <img class="" src="/api/v2.1/seadoc/download-image/2a9ae7c1-d9b8-4299-8def-ad571c399d10/image-cLb5zoSWQ4GokEm4BwGrkg.webp"
+                    </a>
                     draggable="false" alt="" style="width: 481px;">
                 </span>
             </span>
@@ -2625,6 +2628,7 @@ def render_image(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_n
 
     # 不处理行内元素image中的children
     ele_id = escape_html(sdoc_json['id'])
+    image_href = sdoc_json['data'].get('href')
     image_src = sdoc_json['data']['src']
     image_src = escape_html(trans_img_path_to_url(image_src, doc_uuid))
     parent_id = escape_html(parent_id)
@@ -2633,6 +2637,29 @@ def render_image(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_n
         inline_style = f'width: {width}px;'
     else:
         inline_style = ''
+
+    if image_href:
+        img_html = f"""
+        <a class="sdoc-image-page-link" href="{image_href}">
+            <img
+                class=""
+                src="{image_src}"
+                draggable="false"
+                alt=""
+                style="{inline_style}"
+            >
+        </a>
+        """
+    else:
+        img_html = f"""
+        <img
+            class=""
+            src="{image_src}"
+            draggable="false"
+            alt=""
+            style="{inline_style}"
+        >
+        """
 
     html = f"""
     <span
@@ -2646,14 +2673,8 @@ def render_image(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_n
     >
         <span class="sdoc-image-inner">
             <span class="sdoc-image-content">
-                <span>
-                    <img
-                        class=""
-                        src="{image_src}"
-                        draggable="false"
-                        alt=""
-                        style="{inline_style}"
-                    >
+                <span class="sdoc-image-visual">
+                    {img_html}
                 </span>
             </span>
         </span>
