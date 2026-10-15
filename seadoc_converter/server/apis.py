@@ -110,7 +110,7 @@ def convert_markdown_to_sdoc():
         if not resp.ok:
             logger.error(resp.text)
             return {'error_msg': resp.text}, 500
-        
+
         if image_name_url_map:
             success, error_msg = trans_image_url_to_path(doc_uuid, image_name_url_map)
             if error_msg:
@@ -270,11 +270,11 @@ def sdoc_export_to_md():
 
     if isinstance(md_content, dict):
         md_content = json.dumps(md_content)
-    
+
     if isinstance(md_content, str):
         response_content = md_content.encode()  # str -> bytes
     else:
-        response_content = md_content 
+        response_content = md_content
 
     return Response(
         response_content,
@@ -302,6 +302,7 @@ def sdoc_export_to_html():
     download_url = data.get('download_url')
     publish_url = data.get('publish_url')
     page_id_name_dict = data.get('page_id_name_dict')
+    image_root_url = data.get('image_root_url')
 
     extension = Path(path).suffix
     if extension not in ['.sdoc']:
@@ -320,7 +321,8 @@ def sdoc_export_to_html():
     html_body = sdoc2html(sdoc_content,
                           doc_uuid=doc_uuid,
                           publish_url=publish_url,
-                          page_id_name_dict=page_id_name_dict)
+                          page_id_name_dict=page_id_name_dict,
+                          image_root_url=image_root_url)
 
     filename = os.path.basename(path)
     new_filename = quote(filename[:-5] + '.html')
@@ -341,7 +343,7 @@ def confluence_to_wiki():
     except Exception as e:
         logger.exception(e)
         return {'error_msg': 'Bad request.'}, 400
-    
+
     filename = data.get('filename')
     download_url = data.get('download_url')
     upload_url = data.get('upload_url')
@@ -356,7 +358,7 @@ def confluence_to_wiki():
         return {'error_msg': 'username invalid.'}, 400
     if not upload_url:
         return {'error_msg': 'upload_url invalid.'}, 400
-    
+
     underscore_index = filename.rfind('_')
     if underscore_index != -1:
         space_key = filename[underscore_index + 1:-len('.html.zip')]
@@ -380,7 +382,7 @@ def confluence_to_wiki():
             response = requests.get(download_url)
             with ZipFile(BytesIO(response.content), 'r') as zip_ref:
                 zip_ref.extractall(space_dir)
-                
+
     except Exception as e:
         logger.exception(e)
         return {'error_msg': 'Failed to download or extract confluence content.'}, 500

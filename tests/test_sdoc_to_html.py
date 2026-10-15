@@ -10,6 +10,7 @@ os.environ.setdefault(
 )
 
 from seadoc_converter.converter import html_converter
+from seadoc_converter.config import SEAHUB_SERVICE_URL
 
 
 FIXTURE_PATH = os.path.join(os.path.dirname(__file__), 'test.sdoc')
@@ -319,7 +320,8 @@ class TestSdocToHtml(unittest.TestCase):
         self.assertIn('data-parent-id="image-block-id"', html)
         self.assertIn('src="https://example.com/image.png"', html)
         self.assertIn('style="width: 481px;"', html)
-        mock_trans_img_path_to_url.assert_called_once_with('/image-J10ano3ZQV6R0cbAehCKKw.png', DOC_UUID)
+        mock_trans_img_path_to_url.assert_called_once_with(
+            '/image-J10ano3ZQV6R0cbAehCKKw.png', DOC_UUID, '')
 
     def test_render_text(self):
         html = html_converter.render_text(self.get_node_by_id('dncBr5o8RwiAaqd4uwfL1A'))
@@ -425,6 +427,83 @@ class TestSdocToHtml(unittest.TestCase):
         self.assertIn('class="sdoc-callout-white-wrapper"', html)
         self.assertIn('justify-content: center;', html)
         self.assertGreaterEqual(mock_trans_img_path_to_url.call_count, 2)
+
+    IMAGE_NODE = {
+        'id': 'image-node-id',
+        'type': 'image',
+        'data': {'src': '/image-AbC123.png'},
+        'children': [],
+    }
+    CUSTOM_IMAGE_ROOT_URL = 'https://custom.example.com'
+
+    def _expected_image_src(self, host):
+        host = host.rstrip('/')
+        return (
+            f'src="{host}/api/v2.1/seadoc/download-image/'
+            f'{DOC_UUID}/image-AbC123.png"'
+        )
+
+    def test_sdoc2html_image_uses_image_root_url(self):
+        sdoc = {'elements': [deepcopy(self.IMAGE_NODE)]}
+
+        html = html_converter.sdoc2html(
+            sdoc, doc_uuid=DOC_UUID, image_root_url=self.CUSTOM_IMAGE_ROOT_URL)
+
+        self.assertIn(self._expected_image_src(self.CUSTOM_IMAGE_ROOT_URL), html)
+
+    def test_sdoc2html_image_in_image_block_uses_image_root_url(self):
+        sdoc = {'elements': [{
+            'id': 'image-block-id',
+            'type': 'image_block',
+            'align': 'left',
+            'children': [deepcopy(self.IMAGE_NODE)],
+        }]}
+
+        html = html_converter.sdoc2html(
+            sdoc, doc_uuid=DOC_UUID, image_root_url=self.CUSTOM_IMAGE_ROOT_URL)
+
+        self.assertIn(self._expected_image_src(self.CUSTOM_IMAGE_ROOT_URL), html)
+
+    def test_sdoc2html_image_in_column_uses_image_root_url(self):
+        sdoc = {'elements': [{
+            'id': 'column-id',
+            'type': 'column',
+            'width': 100,
+            'children': [deepcopy(self.IMAGE_NODE)],
+        }]}
+
+        html = html_converter.sdoc2html(
+            sdoc, doc_uuid=DOC_UUID, image_root_url=self.CUSTOM_IMAGE_ROOT_URL)
+
+        self.assertIn(self._expected_image_src(self.CUSTOM_IMAGE_ROOT_URL), html)
+
+    def test_sdoc2html_image_in_table_uses_image_root_url(self):
+        sdoc = {'elements': [{
+            'id': 'table-id',
+            'type': 'table',
+            'children': [{
+                'id': 'table-row-id',
+                'type': 'table_row',
+                'children': [{
+                    'id': 'table-cell-id',
+                    'type': 'table_cell',
+                    'children': [deepcopy(self.IMAGE_NODE)],
+                }],
+            }],
+        }]}
+
+        html = html_converter.sdoc2html(
+            sdoc, doc_uuid=DOC_UUID, image_root_url=self.CUSTOM_IMAGE_ROOT_URL)
+
+        self.assertIn(self._expected_image_src(self.CUSTOM_IMAGE_ROOT_URL), html)
+
+    def test_sdoc2html_image_falls_back_to_default_service_url(self):
+        sdoc = {'elements': [deepcopy(self.IMAGE_NODE)]}
+
+        html = html_converter.sdoc2html(sdoc, doc_uuid=DOC_UUID)
+
+        self.assertIn(self._expected_image_src(SEAHUB_SERVICE_URL), html)
+        self.assertNotIn(self.CUSTOM_IMAGE_ROOT_URL, html)
 
 
 if __name__ == '__main__':
