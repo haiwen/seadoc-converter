@@ -350,7 +350,9 @@ def confluence_to_wiki():
     username = data.get('username')
     seafile_server_url = data.get('seafile_server_url', '')
 
-    if not filename:
+    if (not isinstance(filename, str)
+            or not filename.endswith('.html.zip')
+            or any(char in filename for char in ('/', '\\', '\x00'))):
         return {'error_msg': 'path invalid.'}, 400
     if not download_url:
         return {'error_msg': 'download_url invalid.'}, 400
@@ -368,6 +370,10 @@ def confluence_to_wiki():
     else:
         wiki_name = filename[:-len('.html.zip')]
         space_key = wiki_name
+
+    if space_key in ('', '.', '..'):
+        return {'error_msg': 'path invalid.'}, 400
+
     try:
         extract_dir = '/tmp/wiki'
         space_dir = os.path.join(extract_dir, space_key)
