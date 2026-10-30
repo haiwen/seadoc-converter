@@ -241,6 +241,9 @@ def parse_codeblock(node):
 
 
 def md2sdoc(md_txt, username='', image_name_url_map=None):
+    if image_name_url_map is None:
+        image_name_url_map = {}
+
     md = MarkdownIt("gfm-like").use(tasklists_plugin).use(dollarmath_plugin)
     tokens = md.parse(md_txt)
     root = SyntaxTreeNode(tokens).children
