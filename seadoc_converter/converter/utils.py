@@ -158,7 +158,7 @@ def convert_html_to_md(html_file, md_output_dir, seafile_server_url):
         return False
     md_file = f'{md_output_dir}/{html_file.stem}.md'
     process_images_and_attachments(content_div, html_file, seafile_server_url)
-    md_content = convert_to_markdown(content_div, keep_inline_images_in=['span','h2', 'p'])
+    md_content = convert_to_markdown(str(content_div), keep_inline_images_in=['span','h2', 'p'])
     md_content = f"# {title}\n\n{md_content}"
     with open(md_file, 'w', encoding='utf-8') as f:
         f.write(md_content)
@@ -245,4 +245,3 @@ def zip_and_upload_files(file_paths, output_zip_path, upload_url):
     resp = requests.post(upload_url, files=files)
     if not resp.ok:
         raise Exception(f"upload zip file failed: {resp.text}")
-
