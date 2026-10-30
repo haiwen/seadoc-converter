@@ -18,11 +18,17 @@ def _handle_text_style(json_data_text, return_null=False):
     pure_text = text
     bold = json_data_text.get('bold')
     italic = json_data_text.get('italic')
+    underline = json_data_text.get('underline')
+    code = json_data_text.get('code')
 
+    if code:
+        text = "`%s`" % text
     if italic:
         text = "_%s_" % text
     if bold:
         text = "**%s**" % text
+    if underline:
+        text = "<u>%s</u>" % text
 
     if (not text) and return_null:
         text = '.'
@@ -246,6 +252,15 @@ def handle_codeblock(code_bloc_json):
     return "```%s\n%s```" % (lang, output)
 
 
+def handle_divider():
+    return "\n---\n"
+
+
+def handle_formula(formula_json):
+    formula = formula_json.get('data', {}).get('formula', '')
+    return "\n$$\n%s\n$$\n" % formula
+
+
 def handle_blockquote(json_data):
     html = _handle_blockquote_dom(json_data)
     md = md_hander.handle(html)
@@ -357,6 +372,14 @@ def json2md(json_data, doc_uuid=''):
 
     if doc_type == 'code_block':
         output = handle_codeblock(json_data)
+        markdown_output += output
+
+    if doc_type == 'divider':
+        output = handle_divider()
+        markdown_output += output
+
+    if doc_type == 'formula':
+        output = handle_formula(json_data)
         markdown_output += output
 
     if doc_type == 'table':
