@@ -105,7 +105,7 @@ def _handle_list_dom(list_json, indent_level=0, ordered=False):
                             text_name = ''
                             for child in item['children']:
                                 text_name += _handle_text_style(child)[0]
-                            text_url = item.get('href')
+                            text_url = item.get('href') or item.get('url')
                             current_line += f"[{text_name}]({text_url})"
                 
                 if not has_added_current_line:
@@ -177,7 +177,7 @@ def _handle_blockquote_dom(blockquote_json):
 
 # 6 url link
 def _handle_link_dom(link_json):
-    href = link_json.get('href')
+    href = link_json.get('href') or link_json.get('url')
     text = ''
     for child in link_json['children']:
         text += escape(_handle_text_style(child)[0])
@@ -218,7 +218,7 @@ def _handle_table_cell_dom(table_cell_json):
                 text_name = ''
                 for item in child['children']:
                     text_name += _handle_text_style(item)[0]
-                text_url = child.get('href')
+                text_url = child.get('href') or child.get('url')
                 output += f"[{text_name}]({text_url})"
 
     return output.strip()
