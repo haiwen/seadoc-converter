@@ -18,6 +18,11 @@ HEADER_LABEL = [
 def _handle_text_style(json_data_text, return_null=False):
     text = json_data_text.get('text', '')
     pure_text = text
+    if not text:
+        if return_null:
+            text = '.'
+        return text, pure_text
+
     bold = json_data_text.get('bold')
     italic = json_data_text.get('italic')
     underline = json_data_text.get('underline')
@@ -32,8 +37,6 @@ def _handle_text_style(json_data_text, return_null=False):
     if underline:
         text = "<u>%s</u>" % text
 
-    if (not text) and return_null:
-        text = '.'
     return text, pure_text
 
 # sdoc 2 html dom
