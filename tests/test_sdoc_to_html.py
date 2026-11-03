@@ -505,6 +505,39 @@ class TestSdocToHtml(unittest.TestCase):
         self.assertIn(self._expected_image_src(SEAHUB_SERVICE_URL), html)
         self.assertNotIn(self.CUSTOM_IMAGE_ROOT_URL, html)
 
+    def test_unsafe_url_schemes_are_removed(self):
+        for value in ('javascript:alert(1)', 'JaVaScRiPt:alert(1)',
+                      'java\nscript:alert(1)', 'data:text/html,<script>alert(1)</script>'):
+            with self.subTest(value=value):
+                self.assertEqual(html_converter.escape_url(value), '')
+                html = html_converter.render_link({
+                    'title': 'link', 'href': value, 'children': [],
+                })
+                self.assertNotIn('<a ', html)
+        for value in ('https://example.com/', '/relative/path', '#section', 'mailto:a@example.com'):
+            self.assertEqual(html_converter.escape_url(value), value)
+
+    def test_image_link_and_width_cannot_inject_attributes(self):
+        node = deepcopy(self.IMAGE_NODE)
+        node['data'].update({
+            'href': 'https://example.com/" onclick="alert(1)',
+            'width': '100" onerror="alert(1)',
+        })
+        html = html_converter.sdoc2html({'elements': [node]}, doc_uuid=DOC_UUID)
+        self.assertIn('&quot;', html)
+        self.assertNotIn(' onclick="', html)
+        self.assertNotIn(' onerror="', html)
+        self.assertNotIn('width: 100', html)
+
+    def test_wiki_title_and_url_are_escaped(self):
+        html = html_converter.render_wiki_link({
+            'id': 'wiki-link', 'page_id': 'page', 'title': 'fallback',
+        }, publish_url='publish" onclick="alert(1)',
+            page_id_name_dict={'page': '<img src=x onerror=alert(1)>'})
+        self.assertIn('&lt;img', html)
+        self.assertNotIn('<img', html)
+        self.assertNotIn(' onclick="', html)
+
 
 if __name__ == '__main__':
     unittest.main()

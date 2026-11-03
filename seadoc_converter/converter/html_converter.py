@@ -3,6 +3,7 @@ import json
 import html as html_module
 import re
 from io import BytesIO
+from urllib.parse import urlsplit
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -58,6 +59,20 @@ PYGMENTS_LANGUAGE_MAP = {
 # util function
 def escape_html(value):
     return html_module.escape(str(value), quote=True)
+
+
+def escape_url(value, allowed_schemes=('http', 'https', 'mailto', 'tel')):
+    value = str(value or '').strip()
+    # Browsers ignore some control characters when interpreting URL schemes.
+    if any(ord(char) < 32 or ord(char) == 127 for char in value):
+        return ''
+    try:
+        scheme = urlsplit(value).scheme.lower()
+    except ValueError:
+        return ''
+    if scheme and scheme not in allowed_schemes:
+        return ''
+    return escape_html(value)
 
 
 def indent_html(value, indent=' ' * 4):
@@ -1698,7 +1713,7 @@ def render_video(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_id_n
     video_src = sdoc_json['data']['src']
     if not is_embeddable_link:
         video_src = trans_video_path_to_url(video_src, doc_uuid)
-    video_src = escape_html(video_src)
+    video_src = escape_url(video_src, ('http', 'https'))
 
     video_html = f"""
     <video
@@ -2269,7 +2284,7 @@ def render_embed_link(sdoc_json, doc_uuid='', parent_id='', publish_url='', page
     </div>
     """
 
-    link = escape_html(sdoc_json['link'])
+    link = escape_url(sdoc_json['link'], ('http', 'https'))
     link_type = escape_html(sdoc_json['link_type'])
 
     html = f"""
@@ -2373,11 +2388,7 @@ def render_link(sdoc_json, doc_uuid='', parent_id='', publish_url='',
     """
     title = escape_html(sdoc_json['title'])
 
-    href = escape_html(sdoc_json.get('href', ''))
-    if not href:
-        href = escape_html(sdoc_json.get('src', ''))
-    if not href:
-        href = escape_html(sdoc_json.get('url', ''))
+    href = escape_url(sdoc_json.get('href') or sdoc_json.get('src') or sdoc_json.get('url', ''))
 
     linked_id = escape_html(sdoc_json.get('linked_id', ''))
     linked_wiki_page_id = escape_html(sdoc_json.get('linked_wiki_page_id', ''))
@@ -2388,6 +2399,7 @@ def render_link(sdoc_json, doc_uuid='', parent_id='', publish_url='',
         for child in sdoc_json.get('children', [])
     ))
 
+    html = children_html
     if href:
         html = f"""
         <span
@@ -2413,7 +2425,8 @@ def render_link(sdoc_json, doc_uuid='', parent_id='', publish_url='',
         </span>
         """
     elif linked_wiki_page_id:
-        href = trans_wiki_page_id_to_url(publish_url, linked_wiki_page_id)
+        href = escape_url(trans_wiki_page_id_to_url(
+            publish_url, sdoc_json.get('linked_wiki_page_id', '')))
         html = f"""
         <span
             class="virtual-link"
@@ -2466,7 +2479,7 @@ def render_file_link(sdoc_json, doc_uuid='', parent_id='', publish_url='', page_
 
     doc_uuid = sdoc_json['doc_uuid']
     icon_src = "/media/img/file/256/sdoc.png"
-    file_src = f"/api/v2.1/seadoc/file/{doc_uuid}/?doc_uuid={doc_uuid}"
+    file_src = escape_url(f"/api/v2.1/seadoc/file/{doc_uuid}/?doc_uuid={doc_uuid}")
 
     html = f"""
     <span
@@ -2511,11 +2524,9 @@ def render_wiki_link(sdoc_json,
 
     ele_id = escape_html(sdoc_json['id'])
     page_id = sdoc_json['page_id']
-    title = page_id_name_dict.get(page_id)
-    if not title:
-        title = escape_html(sdoc_json['title'])
+    title = escape_html(page_id_name_dict.get(page_id) or sdoc_json['title'])
 
-    wiki_src = f"/wiki/publish/{publish_url}/{page_id}/"
+    wiki_src = escape_url(f"/wiki/publish/{publish_url}/{page_id}/")
 
     html = f"""
     <span
@@ -2652,12 +2663,13 @@ def render_image(sdoc_json, doc_uuid='', parent_id='', publish_url='',
 
     # 不处理行内元素image中的children
     ele_id = escape_html(sdoc_json['id'])
-    image_href = sdoc_json['data'].get('href')
+    image_href = escape_url(sdoc_json['data'].get('href'))
     image_src = sdoc_json['data']['src']
-    image_src = escape_html(trans_img_path_to_url(image_src, doc_uuid, image_root_url))
+    image_src = escape_url(trans_img_path_to_url(
+        image_src, doc_uuid, image_root_url), ('http', 'https'))
     parent_id = escape_html(parent_id)
     width = sdoc_json['data'].get('width')
-    if width:
+    if width and re.fullmatch(r'\d+(?:\.\d+)?', str(width)):
         inline_style = f'width: {width}px;'
     else:
         inline_style = ''
