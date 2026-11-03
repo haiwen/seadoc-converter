@@ -2601,6 +2601,12 @@ def render_image_block(sdoc_json, doc_uuid='', parent_id='', publish_url='',
 
     ele_id = escape_html(sdoc_json['id'])
     align = sdoc_json.get('align', 'left')
+    align_value_map = {
+        'left': 'start',
+        'center': 'center',
+        'right': 'end',
+    }
+    safe_align = align_value_map.get(align, 'start')
 
     children_html = indent_html("".join(
         render_node(child, doc_uuid=doc_uuid, parent_id=ele_id, publish_url=publish_url,
@@ -2614,7 +2620,7 @@ def render_image_block(sdoc_json, doc_uuid='', parent_id='', publish_url='',
         data-slate-node="element"
         data-root="true"
         contenteditable="true"
-        style="display: flex; justify-content: {align};"
+        style="display: flex; justify-content: {safe_align};"
     >
         {children_html}
     </div>
