@@ -29,7 +29,13 @@ def _handle_text_style(json_data_text, return_null=False):
     code = json_data_text.get('code')
 
     if code:
-        text = "`%s`" % text
+        delimiter = '`'
+        while delimiter in text:
+            delimiter += '`'
+        if (text.startswith('`') or text.endswith('`') or
+                (text.startswith(' ') and text.endswith(' ') and text.strip(' '))):
+            text = ' %s ' % text
+        text = '%s%s%s' % (delimiter, text, delimiter)
     if italic:
         text = "_%s_" % text
     if bold:
@@ -39,14 +45,22 @@ def _handle_text_style(json_data_text, return_null=False):
 
     return text, pure_text
 
+
+def _handle_text_style_dom(json_data_text):
+    text = escape(_handle_text_style(json_data_text)[0])
+    if json_data_text.get('code'):
+        # Preserve code spaces until html2text finishes converting the HTML.
+        text = text.replace(' ', '&nbsp;')
+    return text
+
+
 # sdoc 2 html dom
 # 1. header
 def _handle_header_dom(header_json, header_type):
     output = ''
     for child in header_json['children']:
         if 'text' in child:
-            # Keep generated Markdown literal in the intermediate HTML.
-            output += escape(_handle_text_style(child)[0])
+            output += _handle_text_style_dom(child)
         else:
             child_type = child.get('type')
             if child_type == 'link':
@@ -137,7 +151,7 @@ def _handle_check_list_dom(check_list_json):
     checked = check_list_json.get('checked')
     for child in check_list_json['children']:
         if 'text' in child:
-            output += escape(_handle_text_style(child)[0])
+            output += _handle_text_style_dom(child)
         else:
             child_type = child.get('type')
             if child_type == 'link':
@@ -171,7 +185,7 @@ def _handle_blockquote_dom(blockquote_json):
             output += _handle_img_dom(child)
 
         if 'text' in child:
-            text = escape(_handle_text_style(child)[0])
+            text = _handle_text_style_dom(child)
             text_list = text.split("\n")
             output += ''.join(['<p><span>%s</span></p>' % t for t in text_list if t.strip()])
 
@@ -183,7 +197,7 @@ def _handle_link_dom(link_json):
     href = link_json.get('href') or link_json.get('url')
     text = ''
     for child in link_json['children']:
-        text += escape(_handle_text_style(child)[0])
+        text += _handle_text_style_dom(child)
 
     res = "<a href='%s'><span>%s</span></a>" % (href, text)
     return res
@@ -194,7 +208,7 @@ def _handle_pagragh_dom(pagragh_json, doc_uuid=''):
     output = ''
     for child in pagragh_json['children']:
         if 'text' in child:
-            output += escape(_handle_text_style(child)[0])
+            output += _handle_text_style_dom(child)
         else:
             child_type = child.get('type')
             if child_type == 'link':
