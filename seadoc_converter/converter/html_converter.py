@@ -960,7 +960,7 @@ def render_table_cell(sdoc_json, doc_uuid='', parent_id='', publish_url='',
     row_index = escape_html(sdoc_json.get('_row_index', 1))
     col_index = escape_html(sdoc_json.get('_col_index', 1))
     alternate_highlight = sdoc_json.get('alternate_highlight', False)
-    alternate_highlight_color = sdoc_json.get('alternate_highlight_color', '')
+    alternate_highlight_color = escape_html(sdoc_json.get('alternate_highlight_color', ''))
     rowspan = escape_html(sdoc_json.get('rowspan', 1))
     colspan = escape_html(sdoc_json.get('colspan', 1))
     style = sdoc_json.get('style', {})
@@ -1093,7 +1093,7 @@ def render_table_row(sdoc_json, doc_uuid='', parent_id='', publish_url='',
     ele_id = escape_html(sdoc_json['id'])
     row_index = escape_html(sdoc_json.get('_row_index', 1))
     alternate_highlight = escape_html(sdoc_json.get('alternate_highlight', False))
-    alternate_highlight_color = escape_html(sdoc_json.get('alternate_highlight_color', ''))
+    alternate_highlight_color = sdoc_json.get('alternate_highlight_color', '')
 
     cell_html = []
     for index, child in enumerate(sdoc_json.get('children', []), start=1):
