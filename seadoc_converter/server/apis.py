@@ -110,7 +110,7 @@ def convert_markdown_to_sdoc():
                              )
         if not resp.ok:
             logger.error(resp.text)
-            return {'error_msg': resp.text}, 500
+            return {'error_msg': 'Failed to upload converted file.'}, 500
 
         if image_name_url_map:
             success, error_msg = trans_image_url_to_path(doc_uuid, image_name_url_map)
@@ -179,7 +179,7 @@ def sdoc_convert_to_docx():
         resp = requests.post(upload_url, files=files)
         if not resp.ok:
             logger.error(resp.text)
-            return {'error_msg': resp.text}, 500
+            return {'error_msg': 'Failed to upload converted file.'}, 500
 
     except Exception as e:
         logger.error(e)
