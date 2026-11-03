@@ -3,7 +3,7 @@ import jwt
 import json
 import logging
 import requests
-import shutil
+from tempfile import TemporaryDirectory
 from io import BytesIO
 from pathlib import Path
 from urllib.parse import quote
@@ -18,6 +18,7 @@ from seadoc_converter.converter.markdown_converter import sdoc2md
 from seadoc_converter.converter.docx_converter import sdoc2docx
 from seadoc_converter.converter.html_converter import sdoc2html
 from seadoc_converter.converter.utils import process_zip_file
+from seadoc_converter.converter.paths import checked_path, copy_html_files
 
 logger = logging.getLogger(__name__)
 flask_app = Flask(__name__)
@@ -375,31 +376,24 @@ def confluence_to_wiki():
         return {'error_msg': 'path invalid.'}, 400
 
     try:
-        extract_dir = '/tmp/wiki'
-        space_dir = os.path.join(extract_dir, space_key)
-        zip_file_path = os.path.join(extract_dir, filename)
-        if not os.path.exists(extract_dir):
-            os.mkdir(extract_dir)
-        # Deploy on two machines
-        is_same_machine = True
-        if not os.path.exists(space_dir):
-            os.mkdir(space_dir)
-            is_same_machine = False
-            response = requests.get(download_url)
-            with ZipFile(BytesIO(response.content), 'r') as zip_ref:
-                zip_ref.extractall(space_dir)
-
-    except Exception as e:
-        logger.exception(e)
-        return {'error_msg': 'Failed to download or extract confluence content.'}, 500
-    try:
-        cf_id_to_cf_title_map = process_zip_file(space_dir, seafile_server_url, username, upload_url)
+        extract_dir = Path('/tmp/wiki')
+        if extract_dir.is_symlink():
+            raise ValueError('Symbolic links are not allowed in conversion paths.')
+        extract_dir.mkdir(exist_ok=True)
+        shared_space_dir = checked_path(extract_dir, extract_dir / space_key)
+        # Always convert in a private directory, including on shared-machine deployments.
+        with TemporaryDirectory(prefix='confluence-') as task_dir:
+            if shared_space_dir.exists():
+                copy_html_files(shared_space_dir, Path(task_dir))
+            else:
+                response = requests.get(download_url)
+                with ZipFile(BytesIO(response.content), 'r') as zip_ref:
+                    for member in zip_ref.infolist():
+                        checked_path(task_dir, Path(task_dir) / member.filename)
+                    zip_ref.extractall(task_dir)
+            cf_id_to_cf_title_map = process_zip_file(
+                task_dir, seafile_server_url, username, upload_url)
     except Exception as e:
         logger.exception(e)
         return {'error_msg': 'Failed to process confluence content.'}, 500
-    finally:
-        if not is_same_machine:
-            shutil.rmtree(space_dir)
-        if os.path.exists(zip_file_path):
-            os.remove(zip_file_path)
     return {'cf_id_to_cf_title_map': cf_id_to_cf_title_map}, 200

@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 from html_to_markdown import convert_to_markdown
 
 from seadoc_converter.converter.sdoc_converter.md2sdoc import md2sdoc
+from seadoc_converter.converter.paths import checked_path
 from seadoc_converter.config import SEAHUB_SERVICE_URL, SEADOC_PRIVATE_KEY
 
 
@@ -138,9 +139,9 @@ def process_images_and_attachments(content_div, html_file, seafile_server_url):
             new_img_html = f'<img src="{img["src"]}"{alt_attr}{title_attr}{width_attr}{height_attr} />'
             img.replace_with(BeautifulSoup(new_img_html, 'html.parser'))
 
-def convert_html_to_md(html_file, md_output_dir, seafile_server_url):
-    html_file = Path(html_file).resolve()
-    md_output_dir = Path(md_output_dir).resolve()
+def convert_html_to_md(html_file, md_output_dir, seafile_server_url, task_dir):
+    html_file = checked_path(task_dir, html_file)
+    md_output_dir = checked_path(task_dir, md_output_dir)
     
     with open(html_file, 'r', encoding='utf-8') as f:
         html_content = f.read()
@@ -156,7 +157,7 @@ def convert_html_to_md(html_file, md_output_dir, seafile_server_url):
     content_div = soup.find('div', id='main-content')
     if not content_div:
         return False
-    md_file = f'{md_output_dir}/{html_file.stem}.md'
+    md_file = checked_path(task_dir, md_output_dir / (html_file.stem + '.md'))
     process_images_and_attachments(content_div, html_file, seafile_server_url)
     md_content = convert_to_markdown(str(content_div), keep_inline_images_in=['span','h2', 'p'])
     md_content = f"# {title}\n\n{md_content}"
@@ -168,9 +169,10 @@ def convert_html_to_md(html_file, md_output_dir, seafile_server_url):
         pass
     return {html_file.stem: title}
         
-def md_to_sdoc(md_file, sdoc_output_dir, username, upload_url):
-    sdoc_file = f"{sdoc_output_dir}/{md_file.stem}.sdoc"
-    md_file_path = f"{md_file.parent}/{md_file.name}"
+def md_to_sdoc(md_file, sdoc_output_dir, username, upload_url, task_dir):
+    md_file = checked_path(task_dir, md_file)
+    sdoc_file = checked_path(task_dir, Path(sdoc_output_dir) / (md_file.stem + '.sdoc'))
+    md_file_path = md_file
     with open(md_file_path, 'r') as md:
         sdoc_content = md2sdoc(md.read(), username)
     with open(sdoc_file, 'w', encoding='utf-8') as f:
@@ -180,14 +182,14 @@ def md_to_sdoc(md_file, sdoc_output_dir, username, upload_url):
         
 def process_zip_file(space_dir, seafile_server_url, username, upload_url):
     html_files = []
-    dir_path = Path(space_dir).resolve()
+    dir_path = checked_path(space_dir, space_dir)
     for root, _, files in os.walk(dir_path):
         for file in files:
             if file.endswith('.html') and file != 'index.html':
-                html_files.append(Path(root) / file)
+                html_files.append(checked_path(dir_path, Path(root) / file))
     
-    md_output_dir = f'{space_dir}/md_output'
-    sdoc_output_dir = f'{space_dir}/sdoc_output'
+    md_output_dir = checked_path(dir_path, dir_path / 'md_output')
+    sdoc_output_dir = checked_path(dir_path, dir_path / 'sdoc_output')
     if not os.path.exists(md_output_dir):
         os.mkdir(md_output_dir)
     if not os.path.exists(sdoc_output_dir):
@@ -197,7 +199,7 @@ def process_zip_file(space_dir, seafile_server_url, username, upload_url):
     cf_id_to_cf_title_map = {}
     for html_file in html_files:
         try:
-            result = convert_html_to_md(html_file, md_output_dir, seafile_server_url)
+            result = convert_html_to_md(html_file, md_output_dir, seafile_server_url, dir_path)
             if result:
                 cf_id_to_cf_title_map.update(result)
         except Exception as e:
@@ -207,7 +209,7 @@ def process_zip_file(space_dir, seafile_server_url, username, upload_url):
     sdoc_files = []
     for md_file in md_files:
         try:
-            sdoc_file = md_to_sdoc(md_file, sdoc_output_dir, username, upload_url)
+            sdoc_file = md_to_sdoc(md_file, sdoc_output_dir, username, upload_url, dir_path)
             if sdoc_file:
                 sdoc_files.append(sdoc_file)
         except Exception as e:
@@ -217,16 +219,18 @@ def process_zip_file(space_dir, seafile_server_url, username, upload_url):
     # zip and upload sdoc files
     if sdoc_files:
         try:
-            zip_and_upload_files(sdoc_files, f'{space_dir}/sdoc_archive.zip', upload_url)
+            zip_and_upload_files(sdoc_files, dir_path / 'sdoc_archive.zip', upload_url, dir_path)
         except Exception as e:
             raise e
     
     return cf_id_to_cf_title_map
 
-def zip_and_upload_files(file_paths, output_zip_path, upload_url):
+def zip_and_upload_files(file_paths, output_zip_path, upload_url, task_dir):
+    output_zip_path = checked_path(task_dir, output_zip_path)
     # create zip file
     with ZipFile(output_zip_path, 'w') as zip_file:
         for file_path in file_paths:
+            file_path = checked_path(task_dir, file_path)
             # use the file name as the path in the zip file
             file_name = os.path.basename(file_path)
             zip_file.write(file_path, file_name)
