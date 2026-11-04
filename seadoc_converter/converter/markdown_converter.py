@@ -1,3 +1,5 @@
+from html import escape
+
 from html2text import HTML2Text
 from seadoc_converter.converter.utils import trans_img_path_to_url
 
@@ -16,17 +18,41 @@ HEADER_LABEL = [
 def _handle_text_style(json_data_text, return_null=False):
     text = json_data_text.get('text', '')
     pure_text = text
+    if not text:
+        if return_null:
+            text = '.'
+        return text, pure_text
+
     bold = json_data_text.get('bold')
     italic = json_data_text.get('italic')
+    underline = json_data_text.get('underline')
+    code = json_data_text.get('code')
 
+    if code:
+        delimiter = '`'
+        while delimiter in text:
+            delimiter += '`'
+        if (text.startswith('`') or text.endswith('`') or
+                (text.startswith(' ') and text.endswith(' ') and text.strip(' '))):
+            text = ' %s ' % text
+        text = '%s%s%s' % (delimiter, text, delimiter)
     if italic:
         text = "_%s_" % text
     if bold:
         text = "**%s**" % text
+    if underline:
+        text = "<u>%s</u>" % text
 
-    if (not text) and return_null:
-        text = '.'
     return text, pure_text
+
+
+def _handle_text_style_dom(json_data_text):
+    text = escape(_handle_text_style(json_data_text)[0])
+    if json_data_text.get('code'):
+        # Preserve code spaces until html2text finishes converting the HTML.
+        text = text.replace(' ', '&nbsp;')
+    return text
+
 
 # sdoc 2 html dom
 # 1. header
@@ -34,7 +60,7 @@ def _handle_header_dom(header_json, header_type):
     output = ''
     for child in header_json['children']:
         if 'text' in child:
-            output += child.get('text')
+            output += _handle_text_style_dom(child)
         else:
             child_type = child.get('type')
             if child_type == 'link':
@@ -93,8 +119,10 @@ def _handle_list_dom(list_json, indent_level=0, ordered=False):
                     else:
                         item_type = item.get('type')
                         if item_type == 'link':
-                            text_name = item['children'][0]['text']
-                            text_url = item.get('href')
+                            text_name = ''
+                            for child in item['children']:
+                                text_name += _handle_text_style(child)[0]
+                            text_url = item.get('href') or item.get('url')
                             current_line += f"[{text_name}]({text_url})"
                 
                 if not has_added_current_line:
@@ -123,7 +151,7 @@ def _handle_check_list_dom(check_list_json):
     checked = check_list_json.get('checked')
     for child in check_list_json['children']:
         if 'text' in child:
-            output += _handle_text_style(child)[0]
+            output += _handle_text_style_dom(child)
         else:
             child_type = child.get('type')
             if child_type == 'link':
@@ -145,9 +173,7 @@ def _handle_blockquote_dom(blockquote_json):
             output += _handle_list_dom(child, '', child_type == 'ordered_list')
 
         if child_type == 'link':
-            text_name = child['children'][0]['text']
-            text_url = child.get('href')
-            output += "<a href='%s'><span>%s</span></a>" % (text_url, text_name)
+            output += _handle_link_dom(child)
 
         if child_type == 'paragraph':
             output += '%s' % _handle_pagragh_dom(child)
@@ -159,7 +185,7 @@ def _handle_blockquote_dom(blockquote_json):
             output += _handle_img_dom(child)
 
         if 'text' in child:
-            text = child.get('text')
+            text = _handle_text_style_dom(child)
             text_list = text.split("\n")
             output += ''.join(['<p><span>%s</span></p>' % t for t in text_list if t.strip()])
 
@@ -168,10 +194,12 @@ def _handle_blockquote_dom(blockquote_json):
 
 # 6 url link
 def _handle_link_dom(link_json):
-    href = link_json.get('href')
-    link_child = link_json['children'][0]
+    href = link_json.get('href') or link_json.get('url')
+    text = ''
+    for child in link_json['children']:
+        text += _handle_text_style_dom(child)
 
-    res = "<a href='%s'><span>%s</span></a>" % (href, link_child.get('text'))
+    res = "<a href='%s'><span>%s</span></a>" % (href, text)
     return res
 
 
@@ -180,7 +208,7 @@ def _handle_pagragh_dom(pagragh_json, doc_uuid=''):
     output = ''
     for child in pagragh_json['children']:
         if 'text' in child:
-            output += _handle_text_style(child)[0]
+            output += _handle_text_style_dom(child)
         else:
             child_type = child.get('type')
             if child_type == 'link':
@@ -204,8 +232,10 @@ def _handle_table_cell_dom(table_cell_json):
         else:
             child_type = child.get('type')
             if child_type == 'link':
-                text_name = child['children'][0]['text']
-                text_url = child.get('href')
+                text_name = ''
+                for item in child['children']:
+                    text_name += _handle_text_style(item)[0]
+                text_url = child.get('href') or child.get('url')
                 output += f"[{text_name}]({text_url})"
 
     return output.strip()
@@ -244,6 +274,15 @@ def handle_codeblock(code_bloc_json):
         if 'children' in child:
             output += "%s\n" % child.get('children', '')[0].get('text')
     return "```%s\n%s```" % (lang, output)
+
+
+def handle_divider():
+    return "\n---\n"
+
+
+def handle_formula(formula_json):
+    formula = formula_json.get('data', {}).get('formula', '')
+    return "\n$$\n%s\n$$\n" % formula
 
 
 def handle_blockquote(json_data):
@@ -357,6 +396,14 @@ def json2md(json_data, doc_uuid=''):
 
     if doc_type == 'code_block':
         output = handle_codeblock(json_data)
+        markdown_output += output
+
+    if doc_type == 'divider':
+        output = handle_divider()
+        markdown_output += output
+
+    if doc_type == 'formula':
+        output = handle_formula(json_data)
         markdown_output += output
 
     if doc_type == 'table':
