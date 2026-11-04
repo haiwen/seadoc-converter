@@ -1,8 +1,6 @@
 import os
-import jwt
 import json
 import logging
-import requests
 import shutil
 from io import BytesIO
 from pathlib import Path
@@ -10,7 +8,8 @@ from urllib.parse import quote
 from zipfile import ZipFile
 
 from flask import request, Flask, Response
-from seadoc_converter import config
+from seadoc_converter import seahub_api
+from seadoc_converter.server.auth import check_auth_token
 
 from seadoc_converter.converter.sdoc_converter.docx2sdoc import docx2sdoc
 from seadoc_converter.converter.sdoc_converter.md2sdoc import md2sdoc, trans_image_url_to_path
@@ -21,25 +20,6 @@ from seadoc_converter.converter.utils import process_zip_file
 
 logger = logging.getLogger(__name__)
 flask_app = Flask(__name__)
-
-
-def check_auth_token(req):
-    auth = req.headers.get('Authorization', '').split()
-    if not auth or auth[0].lower() != 'token' or len(auth) != 2:
-        return False
-
-    token = auth[1]
-    if not token:
-        return False
-
-    private_key = config.SEADOC_PRIVATE_KEY
-    try:
-        jwt.decode(token, private_key, algorithms=['HS256'])
-    except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError) as e:
-        logger.exception(e)
-        return False
-
-    return True
 
 
 @flask_app.route('/api/v1/file-convert/', methods=['POST'])
@@ -63,20 +43,14 @@ def convert_markdown_to_sdoc():
     if extension not in ['.md', '.sdoc', '.docx']:
         return {'error_msg': 'path invalid.'}, 400
 
-    download_url = data.get('download_url')
-    upload_url = data.get('upload_url')
-
-    if not download_url:
-        return {'error_msg': 'download_url invalid.'}, 400
-
-    if not upload_url:
-        return {'error_msg': 'upload_url invalid.'}, 400
+    file_token = data.get('file_token')
+    if not isinstance(file_token, str) or not file_token:
+        return {'error_msg': 'file_token invalid.'}, 400
 
     if extension == '.docx':
-        file_content = requests.get(download_url).content
+        file_content = seahub_api.get_file_content(file_token)
     else:
-        file_content = requests.get(download_url).content.decode()
-    parent_dir = os.path.dirname(path)
+        file_content = seahub_api.get_file_content(file_token).decode()
     file_name = os.path.basename(path)
     image_name_url_map = None
     if extension == '.md' and src_type == 'markdown' and dst_type == 'sdoc':
@@ -102,11 +76,7 @@ def convert_markdown_to_sdoc():
         file_content = json.dumps(file_content)
 
     try:
-        new_file_path = os.path.join(parent_dir, file_name)
-        resp = requests.post(upload_url,
-                             data={'target_file': new_file_path, 'parent_dir': parent_dir},
-                             files={'file': (file_name, file_content.encode())}
-                             )
+        resp = seahub_api.upload_file(file_token, file_name, file_content.encode())
         if not resp.ok:
             logger.error(resp.text)
             return {'error_msg': 'Failed to upload converted file.'}, 500
@@ -147,17 +117,12 @@ def sdoc_convert_to_docx():
     if extension not in ['.sdoc']:
         return {'error_msg': 'path invalid.'}, 400
 
-    download_url = data.get('download_url')
-    upload_url = data.get('upload_url')
-    if not download_url:
-        return {'error_msg': 'download_url invalid.'}, 400
+    file_token = data.get('file_token')
+    if not isinstance(file_token, str) or not file_token:
+        return {'error_msg': 'file_token invalid.'}, 400
 
-    if not upload_url:
-        return {'error_msg': 'upload_url invalid.'}, 400
+    sdoc_content = seahub_api.get_file_content(file_token).decode()
 
-    sdoc_content = requests.get(download_url).content.decode()
-
-    parent_dir = os.path.dirname(path)
     filename = os.path.basename(path)
     new_filename = filename[:-4] + 'docx'
 
@@ -165,17 +130,12 @@ def sdoc_convert_to_docx():
     if extension == '.sdoc' and src_type == 'sdoc' and dst_type == 'docx':
         if sdoc_content:
             sdoc_content_json = json.loads(sdoc_content)
-            docx_content = sdoc2docx(sdoc_content_json, doc_uuid, username)
+            docx_content = sdoc2docx(sdoc_content_json, doc_uuid, username, file_token=file_token)
     else:
         return {'error_msg': 'unsupported convert type.'}, 400
 
-    # upload file
-    files = {
-        'file': (new_filename, docx_content),
-        'parent_dir': parent_dir,
-    }
     try:
-        resp = requests.post(upload_url, files=files)
+        resp = seahub_api.upload_file(file_token, new_filename, docx_content)
         if not resp.ok:
             logger.error(resp.text)
             return {'error_msg': 'Failed to upload converted file.'}, 500
@@ -206,22 +166,22 @@ def sdoc_export_to_docx():
     doc_uuid = data.get('doc_uuid')
     src_type = data.get('src_type')
     dst_type = data.get('dst_type')
-    download_url = data.get('download_url')
+    file_token = data.get('file_token')
 
     extension = Path(path).suffix
     if extension not in ['.sdoc']:
         return {'error_msg': 'path invalid.'}, 400
 
-    if not download_url:
-        return {'error_msg': 'download_url invalid.'}, 400
+    if not isinstance(file_token, str) or not file_token:
+        return {'error_msg': 'file_token invalid.'}, 400
 
-    sdoc_content = requests.get(download_url).content.decode()
+    sdoc_content = seahub_api.get_file_content(file_token).decode()
 
     docx_content = b''
     if extension == '.sdoc' and src_type == 'sdoc' and dst_type == 'docx':
         if sdoc_content:
             sdoc_content_json = json.loads(sdoc_content)
-            docx_content = sdoc2docx(sdoc_content_json, doc_uuid, username)
+            docx_content = sdoc2docx(sdoc_content_json, doc_uuid, username, file_token=file_token)
     else:
         return {'error_msg': 'unsupported convert type.'}, 400
 
@@ -250,16 +210,16 @@ def sdoc_export_to_md():
     doc_uuid = data.get('doc_uuid')
     src_type = data.get('src_type')
     dst_type = data.get('dst_type')
-    download_url = data.get('download_url')
+    file_token = data.get('file_token')
 
     extension = Path(path).suffix
     if extension not in ['.sdoc']:
         return {'error_msg': 'path invalid.'}, 400
 
-    if not download_url:
-        return {'error_msg': 'download_url invalid.'}, 400
+    if not isinstance(file_token, str) or not file_token:
+        return {'error_msg': 'file_token invalid.'}, 400
 
-    sdoc_content = requests.get(download_url).content.decode()
+    sdoc_content = seahub_api.get_file_content(file_token).decode()
     md_content = ''
     if extension == '.sdoc' and src_type == 'sdoc' and dst_type == 'md':
         if sdoc_content:
@@ -299,7 +259,7 @@ def sdoc_export_to_html():
     doc_uuid = data.get('doc_uuid')
     src_type = data.get('src_type')
     dst_type = data.get('dst_type')
-    download_url = data.get('download_url')
+    file_token = data.get('file_token')
     publish_url = data.get('publish_url')
     page_id_name_dict = data.get('page_id_name_dict')
     image_root_url = data.get('image_root_url')
@@ -308,13 +268,13 @@ def sdoc_export_to_html():
     if extension not in ['.sdoc']:
         return {'error_msg': 'path invalid.'}, 400
 
-    if not download_url:
-        return {'error_msg': 'download_url invalid.'}, 400
+    if not isinstance(file_token, str) or not file_token:
+        return {'error_msg': 'file_token invalid.'}, 400
 
     if not (extension == '.sdoc' and src_type == 'sdoc' and dst_type == 'html'):
         return {'error_msg': 'unsupported convert type.'}, 400
 
-    sdoc_content = requests.get(download_url).content.decode()
+    sdoc_content = seahub_api.get_file_content(file_token).decode()
     if not sdoc_content:
         return {'error_msg': 'Empty sdoc content.'}, 400
 
@@ -345,8 +305,7 @@ def confluence_to_wiki():
         return {'error_msg': 'Bad request.'}, 400
 
     filename = data.get('filename')
-    download_url = data.get('download_url')
-    upload_url = data.get('upload_url')
+    file_token = data.get('file_token')
     username = data.get('username')
     seafile_server_url = data.get('seafile_server_url', '')
 
@@ -354,12 +313,10 @@ def confluence_to_wiki():
             or not filename.endswith('.html.zip')
             or any(char in filename for char in ('/', '\\', '\x00'))):
         return {'error_msg': 'path invalid.'}, 400
-    if not download_url:
-        return {'error_msg': 'download_url invalid.'}, 400
+    if not isinstance(file_token, str) or not file_token:
+        return {'error_msg': 'file_token invalid.'}, 400
     if not username:
         return {'error_msg': 'username invalid.'}, 400
-    if not upload_url:
-        return {'error_msg': 'upload_url invalid.'}, 400
 
     underscore_index = filename.rfind('_')
     if underscore_index != -1:
@@ -385,15 +342,15 @@ def confluence_to_wiki():
         if not os.path.exists(space_dir):
             os.mkdir(space_dir)
             is_same_machine = False
-            response = requests.get(download_url)
-            with ZipFile(BytesIO(response.content), 'r') as zip_ref:
+            content = seahub_api.get_file_content(file_token)
+            with ZipFile(BytesIO(content), 'r') as zip_ref:
                 zip_ref.extractall(space_dir)
 
     except Exception as e:
         logger.exception(e)
         return {'error_msg': 'Failed to download or extract confluence content.'}, 500
     try:
-        cf_id_to_cf_title_map = process_zip_file(space_dir, seafile_server_url, username, upload_url)
+        cf_id_to_cf_title_map = process_zip_file(space_dir, seafile_server_url, username, file_token)
     except Exception as e:
         logger.exception(e)
         return {'error_msg': 'Failed to process confluence content.'}, 500

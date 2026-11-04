@@ -2,8 +2,6 @@ import os
 import io
 import docx
 import logging
-import requests
-import time
 
 from docx import Document
 from docx.shared import Pt, Inches, RGBColor
@@ -11,30 +9,11 @@ from docx.oxml.ns import qn
 from docx.oxml.shared import OxmlElement
 
 from seadoc_converter.config import SEAHUB_SERVICE_URL
-from seadoc_converter.converter.utils import gen_jwt_auth_header
+from seadoc_converter import seahub_api
 
 logger = logging.getLogger(__name__)
 
 DEFAULT_CALLOUT_COLOR = 'fef7e0'
-
-
-def get_image_content_url(file_uuid, image_name):
-
-    payload = {
-        'file_uuid': file_uuid,
-        'exp': int(time.time()) + 300
-    }
-
-    url = f'{SEAHUB_SERVICE_URL}/api/v2.1/seadoc/image-download-link/{file_uuid}/'
-    params = {'image_name': image_name}
-    headers = gen_jwt_auth_header(payload)
-
-    resp = requests.get(url, params, headers=headers)
-    if resp.status_code == 200:
-        return resp.json().get('download_link')
-    else:
-        logger.error(resp.__dict__)
-        return ""
 
 
 def hex_to_rgb(hex_color):
@@ -42,7 +21,7 @@ def hex_to_rgb(hex_color):
     return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
 
 
-def sdoc2docx(file_content_json, file_uuid, username):
+def sdoc2docx(file_content_json, file_uuid, username, file_token=None):
 
     def add_hyperlink(paragraph, url, text, color):
         """
@@ -258,14 +237,12 @@ def sdoc2docx(file_content_json, file_uuid, username):
                     image_file_path = item['data']['src']
 
             image_name = os.path.basename(image_file_path)
-            image_content_url = get_image_content_url(file_uuid, image_name)
-            if image_content_url:
-                resp = requests.get(image_content_url)
-                image_content = resp.content
+            if file_token:
                 try:
+                    image_content = seahub_api.get_file_content(file_token, image_name=image_name)
                     document.add_picture(io.BytesIO(image_content), width=Inches(5))
                 except Exception as e:
-                    logger.debug('add image to docx failed: file_uuid: %s, image_path: %s, error: %s', file_uuid, image_content_url, e)
+                    logger.debug('add image to docx failed: file_uuid: %s, image_path: %s, error: %s', file_uuid, image_name, e)
             else:
                 logger.exception(f'can not get image content: {file_uuid} {image_file_path}')
 
