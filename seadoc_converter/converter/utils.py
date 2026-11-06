@@ -171,8 +171,16 @@ def convert_html_to_md(html_file, md_output_dir, seafile_server_url):
 def md_to_sdoc(md_file, sdoc_output_dir, username):
     sdoc_file = f"{sdoc_output_dir}/{md_file.stem}.sdoc"
     md_file_path = f"{md_file.parent}/{md_file.name}"
+    image_name_url_map = {}
     with open(md_file_path, 'r') as md:
-        sdoc_content = md2sdoc(md.read(), username)
+        sdoc_content = md2sdoc(md.read(), username=username, image_name_url_map=image_name_url_map)
+    elements = list(sdoc_content['elements'])
+    while elements:
+        element = elements.pop()
+        if element.get('type') == 'image':
+            image_name = element['data']['src'].lstrip('/')
+            element['data']['src'] = image_name_url_map[image_name]
+        elements.extend(element.get('children', []))
     with open(sdoc_file, 'w', encoding='utf-8') as f:
         f.write(json.dumps(sdoc_content))
     return sdoc_file
