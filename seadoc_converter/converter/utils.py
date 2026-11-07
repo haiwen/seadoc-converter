@@ -3,13 +3,13 @@ import re
 import jwt
 import json
 import logging
-import requests
 
 from zipfile import ZipFile
 from pathlib import Path
 from bs4 import BeautifulSoup
 from html_to_markdown import convert_to_markdown
 
+from seadoc_converter import seahub_api
 from seadoc_converter.converter.sdoc_converter.md2sdoc import md2sdoc
 from seadoc_converter.config import SEAHUB_SERVICE_URL, SEADOC_PRIVATE_KEY
 
@@ -168,17 +168,25 @@ def convert_html_to_md(html_file, md_output_dir, seafile_server_url):
         pass
     return {html_file.stem: title}
         
-def md_to_sdoc(md_file, sdoc_output_dir, username, upload_url):
+def md_to_sdoc(md_file, sdoc_output_dir, username):
     sdoc_file = f"{sdoc_output_dir}/{md_file.stem}.sdoc"
     md_file_path = f"{md_file.parent}/{md_file.name}"
+    image_name_url_map = {}
     with open(md_file_path, 'r') as md:
-        sdoc_content = md2sdoc(md.read(), username)
+        sdoc_content = md2sdoc(md.read(), username=username, image_name_url_map=image_name_url_map)
+    elements = list(sdoc_content['elements'])
+    while elements:
+        element = elements.pop()
+        if element.get('type') == 'image':
+            image_name = element['data']['src'].lstrip('/')
+            element['data']['src'] = image_name_url_map[image_name]
+        elements.extend(element.get('children', []))
     with open(sdoc_file, 'w', encoding='utf-8') as f:
         f.write(json.dumps(sdoc_content))
     return sdoc_file
 
         
-def process_zip_file(space_dir, seafile_server_url, username, upload_url):
+def process_zip_file(space_dir, seafile_server_url, username, file_token):
     html_files = []
     dir_path = Path(space_dir).resolve()
     for root, _, files in os.walk(dir_path):
@@ -207,7 +215,7 @@ def process_zip_file(space_dir, seafile_server_url, username, upload_url):
     sdoc_files = []
     for md_file in md_files:
         try:
-            sdoc_file = md_to_sdoc(md_file, sdoc_output_dir, username, upload_url)
+            sdoc_file = md_to_sdoc(md_file, sdoc_output_dir, username)
             if sdoc_file:
                 sdoc_files.append(sdoc_file)
         except Exception as e:
@@ -217,13 +225,13 @@ def process_zip_file(space_dir, seafile_server_url, username, upload_url):
     # zip and upload sdoc files
     if sdoc_files:
         try:
-            zip_and_upload_files(sdoc_files, f'{space_dir}/sdoc_archive.zip', upload_url)
+            zip_and_upload_files(sdoc_files, f'{space_dir}/sdoc_archive.zip', file_token)
         except Exception as e:
             raise e
     
     return cf_id_to_cf_title_map
 
-def zip_and_upload_files(file_paths, output_zip_path, upload_url):
+def zip_and_upload_files(file_paths, output_zip_path, file_token):
     # create zip file
     with ZipFile(output_zip_path, 'w') as zip_file:
         for file_path in file_paths:
@@ -237,11 +245,6 @@ def zip_and_upload_files(file_paths, output_zip_path, upload_url):
     
     # upload the zip file
     archive_name = os.path.basename(output_zip_path)
-    files = {
-        'file': (archive_name, zip_content),
-        'parent_dir': 'tmp/',
-    }
-    
-    resp = requests.post(upload_url, files=files)
+    resp = seahub_api.upload_file(file_token, archive_name, zip_content)
     if not resp.ok:
         raise Exception(f"upload zip file failed: {resp.text}")
