@@ -1,15 +1,15 @@
 import os
 import json
 import logging
-import shutil
 from io import BytesIO
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from urllib.parse import quote
 from zipfile import ZipFile
 
 from flask import request, Flask, Response
 from seadoc_converter import seahub_api
-from seadoc_converter.server.auth import check_auth_token
+from seadoc_converter.server.auth import check_auth_token, get_file_token_payload
 
 from seadoc_converter.converter.sdoc_converter.docx2sdoc import docx2sdoc
 from seadoc_converter.converter.sdoc_converter.md2sdoc import md2sdoc, trans_image_url_to_path
@@ -34,7 +34,6 @@ def convert_markdown_to_sdoc():
         return {'error_msg': 'Bad request.'}, 400
 
     path = data.get('path')
-    username = data.get('username')
     doc_uuid = data.get('doc_uuid')
     src_type = data.get('src_type')
     dst_type = data.get('dst_type')
@@ -46,6 +45,13 @@ def convert_markdown_to_sdoc():
     file_token = data.get('file_token')
     if not isinstance(file_token, str) or not file_token:
         return {'error_msg': 'file_token invalid.'}, 400
+
+    payload = get_file_token_payload(file_token)
+    if (payload is None or not payload.get('output_path') or not payload.get('doc_uuid')
+            or payload['doc_uuid'] != doc_uuid):
+        return {'error_msg': 'Permission denied'}, 403
+    doc_uuid = payload['doc_uuid']
+    username = payload['username']
 
     if extension == '.docx':
         file_content = seahub_api.get_file_content(file_token)
@@ -318,45 +324,23 @@ def confluence_to_wiki():
     if not username:
         return {'error_msg': 'username invalid.'}, 400
 
-    underscore_index = filename.rfind('_')
-    if underscore_index != -1:
-        space_key = filename[underscore_index + 1:-len('.html.zip')]
-    elif 'Confluence-space-export-' in filename:
-        wiki_name = filename[:-len('.html.zip')]
-        space_key = filename[len('Confluence-space-export-'):-len('.html.zip')]
-    else:
-        wiki_name = filename[:-len('.html.zip')]
-        space_key = wiki_name
+    payload = get_file_token_payload(file_token)
+    if (payload is None or not payload.get('output_path')
+            or payload['filename'] != filename):
+        return {'error_msg': 'Permission denied'}, 403
+    username = payload['username']
 
-    if space_key in ('', '.', '..'):
-        return {'error_msg': 'path invalid.'}, 400
-
-    try:
-        extract_dir = '/tmp/wiki'
-        space_dir = os.path.join(extract_dir, space_key)
-        zip_file_path = os.path.join(extract_dir, filename)
-        if not os.path.exists(extract_dir):
-            os.mkdir(extract_dir)
-        # Deploy on two machines
-        is_same_machine = True
-        if not os.path.exists(space_dir):
-            os.mkdir(space_dir)
-            is_same_machine = False
+    with TemporaryDirectory(prefix='confluence-') as space_dir:
+        try:
             content = seahub_api.get_file_content(file_token)
             with ZipFile(BytesIO(content), 'r') as zip_ref:
                 zip_ref.extractall(space_dir)
-
-    except Exception as e:
-        logger.exception(e)
-        return {'error_msg': 'Failed to download or extract confluence content.'}, 500
-    try:
-        cf_id_to_cf_title_map = process_zip_file(space_dir, seafile_server_url, username, file_token)
-    except Exception as e:
-        logger.exception(e)
-        return {'error_msg': 'Failed to process confluence content.'}, 500
-    finally:
-        if not is_same_machine:
-            shutil.rmtree(space_dir)
-        if os.path.exists(zip_file_path):
-            os.remove(zip_file_path)
+        except Exception as e:
+            logger.exception(e)
+            return {'error_msg': 'Failed to download or extract confluence content.'}, 500
+        try:
+            cf_id_to_cf_title_map = process_zip_file(space_dir, seafile_server_url, username, file_token)
+        except Exception as e:
+            logger.exception(e)
+            return {'error_msg': 'Failed to process confluence content.'}, 500
     return {'cf_id_to_cf_title_map': cf_id_to_cf_title_map}, 200

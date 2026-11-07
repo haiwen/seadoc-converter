@@ -19,3 +19,13 @@ def check_auth_token(req):
         return False
 
     return True
+
+
+def get_file_token_payload(file_token):
+    try:
+        return jwt.decode(
+            file_token, config.SEADOC_PRIVATE_KEY, algorithms=['HS256'],
+            audience='seadoc-converter-file',
+            options={'require': ['exp', 'aud', 'repo_id', 'file_id', 'filename', 'username']})
+    except jwt.InvalidTokenError:
+        return None
