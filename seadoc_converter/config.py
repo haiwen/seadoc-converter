@@ -13,6 +13,10 @@ SERVER_PORT = '8888'
 SEADOC_PRIVATE_KEY = ''
 SEAHUB_SERVICE_URL = 'http://127.0.0.1:8000'
 
+# XML parsing uses substantially more memory than the uncompressed source.
+DOCX_MAX_MEMBER_SIZE = 32 * 1024 * 1024
+DOCX_MAX_UNCOMPRESSED_SIZE = 128 * 1024 * 1024
+
 LOG_DIR = os.environ.get('LOG_DIR', '')
 LOG_FILE = os.path.join(LOG_DIR, 'seadoc-converter.log')
 LOG_LEVEL = 'info'
