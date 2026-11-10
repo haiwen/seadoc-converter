@@ -29,4 +29,4 @@ jobs:
         env:
           SDOC_SERVER_DIR: ${{ github.workspace }}
           SEAHUB_SERVICE_URL: http://example.test
-        run: python -m unittest tests.test_sdoc_to_html
+        run: python -m unittest discover -s tests -p 'test_*.py' -v

@@ -20,6 +20,8 @@ from docx.text.hyperlink import Hyperlink
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 from seadoc_converter.config import SEAHUB_SERVICE_URL
+from seadoc_converter import config
+from seadoc_converter.converter.docx_limits import check_docx_sizes, DocxSizeLimitError
 from seadoc_converter.converter.utils import gen_jwt_auth_header
 
 
@@ -90,6 +92,7 @@ def parse_block_contents(items, docx, docx_uuid):
                 upload_link = f"{SEAHUB_SERVICE_URL}/api/v2.1/seadoc/upload-image/{docx_uuid}/"
                 headers = gen_jwt_auth_header({
                     'file_uuid': docx_uuid,
+                    'permission': 'rw',
                     'exp': int(time.time()) + 300
                 })
                 resp = requests.post(upload_link, headers=headers,
@@ -355,7 +358,12 @@ def docx2sdoc(docx, username, docx_uuid):
     # Fix according to: https://github.com/python-openxml/python-docx/issues/1105s
     _SerializedRelationships.load_from_xml = load_from_xml_v2
     try:
+        check_docx_sizes(BytesIO(docx), config.DOCX_MAX_MEMBER_SIZE,
+                         config.DOCX_MAX_UNCOMPRESSED_SIZE)
         docx = Document(BytesIO(docx))
+    except DocxSizeLimitError:
+        logger.warning('DOCX exceeds uncompressed size limits: doc=%s', docx_uuid)
+        return None, 'DOCX uncompressed content is too large to convert.'
     except Exception as e:
         logging.error(e)
         return None, "Docx file is invalid."
