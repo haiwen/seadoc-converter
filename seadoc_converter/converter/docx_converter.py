@@ -2,6 +2,7 @@ import os
 import io
 import docx
 import logging
+import re
 
 from docx import Document
 from docx.shared import Pt, Inches, RGBColor
@@ -17,8 +18,30 @@ DEFAULT_CALLOUT_COLOR = 'fef7e0'
 
 
 def hex_to_rgb(hex_color):
-    hex_color = hex_color.lstrip('#')
-    return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+    """Parse hex/rgb/rgba colors; DOCX colors do not support alpha."""
+    if isinstance(hex_color, str):
+        color = hex_color.strip().lower()
+        if re.fullmatch(r'#?(?:[0-9a-f]{3}|[0-9a-f]{6})', color):
+            color = color.lstrip('#')
+            if len(color) == 3:
+                color = ''.join(channel * 2 for channel in color)
+            return tuple(int(color[i:i+2], 16) for i in (0, 2, 4))
+
+        match = re.fullmatch(r'(rgb|rgba)\(\s*([^()]*)\s*\)', color)
+        if match:
+            channels = [channel.strip() for channel in match.group(2).split(',')]
+            expected_count = 4 if match.group(1) == 'rgba' else 3
+            if len(channels) == expected_count:
+                try:
+                    rgb = tuple(int(channel) for channel in channels[:3])
+                    alpha = float(channels[3]) if expected_count == 4 else 1
+                    if all(0 <= channel <= 255 for channel in rgb) and 0 <= alpha <= 1:
+                        return rgb
+                except ValueError:
+                    pass
+
+    logger.warning('Ignoring unsupported DOCX color: %r', hex_color)
+    return None
 
 
 def sdoc2docx(file_content_json, file_uuid, username, file_token=None):
@@ -265,7 +288,8 @@ def sdoc2docx(file_content_json, file_uuid, username, file_token=None):
                         run.italic = True if italic else False
                         if hex_color := cell_run.get('color', None):
                             rgb_color = hex_to_rgb(hex_color)
-                            run.font.color.rgb = RGBColor(*rgb_color)
+                            if rgb_color is not None:
+                                run.font.color.rgb = RGBColor(*rgb_color)
                         if font_name := cell_run.get('font', None):
                             run.font.name = font_name
                             run._element.rPr.rFonts.set(qn('w:eastAsia'), font_name)
@@ -280,7 +304,10 @@ def sdoc2docx(file_content_json, file_uuid, username, file_token=None):
             shd = OxmlElement('w:shd')
             color = DEFAULT_CALLOUT_COLOR
             if style:
-                color = style.get('background_color').lstrip('#')
+                if background_color := style.get('background_color'):
+                    rgb_color = hex_to_rgb(background_color)
+                    if rgb_color is not None:
+                        color = str(RGBColor(*rgb_color))
 
             # Add attributes to the element
             shd.set(qn('w:fill'), color)
@@ -301,7 +328,8 @@ def sdoc2docx(file_content_json, file_uuid, username, file_token=None):
                 run.italic = True if italic else False
                 if hex_color := text_dict.get('color', None):
                     rgb_color = hex_to_rgb(hex_color)
-                    run.font.color.rgb = RGBColor(*rgb_color)
+                    if rgb_color is not None:
+                        run.font.color.rgb = RGBColor(*rgb_color)
                 if font_name := text_dict.get('font', None):
                     run.font.name = font_name
                     run._element.rPr.rFonts.set(qn('w:eastAsia'), font_name)
@@ -321,7 +349,8 @@ def sdoc2docx(file_content_json, file_uuid, username, file_token=None):
                 run.italic = True if italic else False
                 if hex_color := text_dict.get('color', None):
                     rgb_color = hex_to_rgb(hex_color)
-                    run.font.color.rgb = RGBColor(*rgb_color)
+                    if rgb_color is not None:
+                        run.font.color.rgb = RGBColor(*rgb_color)
                 if font_name := text_dict.get('font', None):
                     run.font.name = font_name
                     run._element.rPr.rFonts.set(qn('w:eastAsia'), font_name)
