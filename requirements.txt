@@ -3,12 +3,12 @@ gevent==25.9.*
 html2text==2025.4.15
 pyjwt==2.15.*
 python-docx==1.2.*
-pymysql
-requests==2.32.*
+pymysql==1.1.*
+requests==2.34.*
 beautifulsoup4==4.14.*
 markdown-it-py==4.0.0
 mdit_py_plugins==0.5.*
 linkify-it-py==2.0.3
 html-to-markdown==2.27.*
 matplotlib==3.10.*
-Pygments==2.19.*
+Pygments==2.21.*
